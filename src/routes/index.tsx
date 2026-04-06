@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import {
   FolderOpen,
+  Save,
   Dna,
   List,
   Info,
@@ -25,6 +26,7 @@ import { useTheme, type Theme } from '#/lib/use-theme';
 import { cn } from '#/lib/utils';
 import type { Feature } from '#/lib/xdna-parser';
 import { readSequenceFile } from '#/lib/xdna-parser';
+import { serializeDNAFile } from '#/lib/xdna-parser';
 import type { XdnaFile } from '#/lib/xdna-parser';
 
 export const Route = createFileRoute('/')({ component: App });
@@ -78,6 +80,10 @@ function create_feature(sequence_length: number, index: number, selection?: Sele
     },
     color: '150,150,150,',
   };
+}
+
+function get_download_name(file_name: string) {
+  return file_name.replace(/\.(xdna|txt)$/i, '') + '.xdna';
 }
 
 function App() {
@@ -211,6 +217,26 @@ function App() {
     });
   }, [features, selectedFeature, xdna]);
 
+  const handleSave = useCallback(() => {
+    if (!xdna) {
+      return;
+    }
+
+    const file_bytes = serializeDNAFile(xdna);
+    const file_buffer = new ArrayBuffer(file_bytes.byteLength);
+    new Uint8Array(file_buffer).set(file_bytes);
+    const blob = new Blob([file_buffer], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = get_download_name(xdna.file.name);
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }, [xdna]);
+
   const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;
   const nextTheme: Theme = theme === 'auto' ? 'light' : theme === 'light' ? 'dark' : 'auto';
 
@@ -230,6 +256,17 @@ function App() {
           <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1.5 text-xs">
             <FolderOpen size={13} />
             Open file
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSave}
+            className="gap-1.5 text-xs"
+            disabled={!xdna}
+            title="Save current state as XDNA"
+          >
+            <Save size={13} />
+            Save XDNA
           </Button>
           <input ref={fileInputRef} type="file" accept=".xdna,.txt" className="hidden" onChange={onFileInput} />
         </div>
@@ -379,8 +416,8 @@ function App() {
                 <div className="space-y-1 text-center">
                   <p className="text-foreground font-semibold">Open an XDNA or TXT file</p>
                   <p className="text-muted-foreground text-sm">
-                    Drag & drop a <code className="text-xs">.xdna</code> or <code className="text-xs">.txt</code>{' '}
-                    file here, or use the button above
+                    Drag & drop a <code className="text-xs">.xdna</code> or <code className="text-xs">.txt</code> file
+                    here, or use the button above
                   </p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-2">

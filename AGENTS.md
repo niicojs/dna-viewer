@@ -35,3 +35,5 @@
 ## Naming
 
 - Use `snake_case` for both local variable names and filenames.
+- Use `PascalCase` for React component names.
+- Use `camelCase` for functions

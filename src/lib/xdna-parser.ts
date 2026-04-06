@@ -26,6 +26,37 @@ function readLatin1(view: DataView, start: number, end: number): string {
   return decoder.decode(new Uint8Array(view.buffer, view.byteOffset + start, end - start));
 }
 
+function encode_latin1(value: string, label: string): Uint8Array {
+  const bytes = new Uint8Array(value.length);
+
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code > 0xff) {
+      fail(`${label} contains unsupported non-Latin-1 characters`);
+    }
+
+    bytes[index] = code;
+  }
+
+  return bytes;
+}
+
+function encode_pascal_string(value: string, label: string): Uint8Array {
+  const bytes = encode_latin1(value, label);
+  if (bytes.length > 0xff) {
+    fail(`${label} is too long for XDNA (${bytes.length} bytes, max 255)`);
+  }
+
+  const result = new Uint8Array(bytes.length + 1);
+  result[0] = bytes.length;
+  result.set(bytes, 1);
+  return result;
+}
+
+function write_uint32_be(target: Uint8Array, offset: number, value: number) {
+  new DataView(target.buffer, target.byteOffset, target.byteLength).setUint32(offset, value, false);
+}
+
 function readPascalString(view: DataView, offset: number, label: string) {
   assertRange(view, offset, 1, `${label} length`);
   const length = view.getUint8(offset);
@@ -278,7 +309,7 @@ export function parseDnaText(text: string, fileName = 'unknown.txt', fileSize = 
       version: 0,
       sequenceType: 'DNA',
       rawSequenceType: 1,
-      topology: 'linear',
+      topology: 'circular',
       rawTopology: 0,
       sequenceLength: sequence.length,
       negativeLength: 0,
@@ -337,4 +368,100 @@ export async function readSequenceFile(file: File): Promise<XdnaFile> {
   }
 
   throw new Error(`Unsupported file type: "${file.name}"`);
+}
+
+function normalizeOverhangLength(overhang: Overhang): number {
+  if (overhang.type === 'none' || !overhang.sequence) {
+    return 0;
+  }
+
+  if (overhang.declaredLength !== 0) {
+    return overhang.declaredLength;
+  }
+
+  return overhang.type === "5'" ? overhang.sequence.length : -overhang.sequence.length;
+}
+
+function serializeOverhang(overhang: Overhang, label: string): Uint8Array {
+  const declared_length = normalizeOverhangLength(overhang);
+  const length_field = encode_pascal_string(String(declared_length), `${label} length`);
+  const sequence = declared_length === 0 ? new Uint8Array(0) : encode_latin1(overhang.sequence, `${label} sequence`);
+
+  if (Math.abs(declared_length) !== sequence.length) {
+    fail(`${label} length does not match its sequence`);
+  }
+
+  const result = new Uint8Array(length_field.length + sequence.length);
+  result.set(length_field, 0);
+  result.set(sequence, length_field.length);
+  return result;
+}
+
+function serializeFeature(feature: Feature, index: number): Uint8Array {
+  const parts = [
+    encode_pascal_string(feature.name, `feature ${index} name`),
+    encode_pascal_string(feature.description, `feature ${index} description`),
+    encode_pascal_string(feature.type, `feature ${index} type`),
+    encode_pascal_string(String(feature.start), `feature ${index} start`),
+    encode_pascal_string(String(feature.end), `feature ${index} end`),
+    Uint8Array.of(feature.flags.rawStrand, feature.flags.rawVisible, feature.flags.unknown, feature.flags.rawArrow),
+    encode_pascal_string(feature.color, `feature ${index} color`),
+  ];
+
+  const total_length = parts.reduce((sum, part) => sum + part.length, 0);
+  const result = new Uint8Array(total_length);
+  let offset = 0;
+
+  for (const part of parts) {
+    result.set(part, offset);
+    offset += part.length;
+  }
+
+  return result;
+}
+
+export function serializeDNAFile(xdna: XdnaFile): Uint8Array {
+  const sequence = encode_latin1(xdna.sequence, 'sequence');
+  const comment = encode_latin1(xdna.comment, 'comment');
+  const annotations = xdna.annotations;
+  const features = annotations?.features ?? [];
+
+  if (features.length > 0xff) {
+    fail(`Too many features for XDNA (${features.length}, max 255)`);
+  }
+
+  const annotation_parts = annotations
+    ? [
+        Uint8Array.of(annotations.marker),
+        serializeOverhang(annotations.rightOverhang, 'right overhang'),
+        serializeOverhang(annotations.leftOverhang, 'left overhang'),
+        Uint8Array.of(features.length),
+        ...features.map((feature, index) => serializeFeature(feature, index + 1)),
+      ]
+    : [];
+
+  const annotations_length = annotation_parts.reduce((sum, part) => sum + part.length, 0);
+  const total_length = HEADER_SIZE + sequence.length + comment.length + annotations_length;
+  const result = new Uint8Array(total_length);
+
+  result[0] = xdna.header.version;
+  result[1] = xdna.header.rawSequenceType;
+  result[2] = xdna.header.rawTopology;
+  write_uint32_be(result, 28, sequence.length);
+  write_uint32_be(result, 32, xdna.header.negativeLength);
+  write_uint32_be(result, 96, comment.length);
+  result[111] = xdna.header.terminator;
+
+  let offset = HEADER_SIZE;
+  result.set(sequence, offset);
+  offset += sequence.length;
+  result.set(comment, offset);
+  offset += comment.length;
+
+  for (const part of annotation_parts) {
+    result.set(part, offset);
+    offset += part.length;
+  }
+
+  return result;
 }
