@@ -131,11 +131,11 @@ function App() {
     <div className="app-shell">
       {/* ── Title bar ── */}
       <header className="app-titlebar">
-        <Dna size={16} className="text-primary flex-shrink-0" />
-        <span className="text-foreground flex-shrink-0 text-sm font-semibold">XDNA Viewer</span>
+        <Dna size={16} className="text-primary shrink-0" />
+        <span className="text-foreground shrink-0 text-sm font-semibold">XDNA Viewer</span>
 
         {xdna && (
-          <span className="text-muted-foreground ml-2 max-w-[200px] truncate text-xs">
+          <span className="text-muted-foreground ml-2 max-w-50 truncate text-xs">
             — {xdna.file.name}
           </span>
         )}
@@ -162,7 +162,7 @@ function App() {
         {/* ── Sidebar ── */}
         {xdna && (
           <aside className="app-sidebar">
-            <div className="border-border flex flex-shrink-0 items-center gap-2 border-b px-3 py-2">
+            <div className="border-border flex shrink-0 items-center gap-2 border-b px-3 py-2">
               <List size={13} className="text-muted-foreground" />
               <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Features</span>
               <span className="text-muted-foreground bg-muted ml-auto rounded-full px-1.5 py-0.5 text-xs font-medium">
@@ -178,7 +178,7 @@ function App() {
               />
             </div>
 
-            <div className="border-border text-muted-foreground flex-shrink-0 space-y-0.5 border-t px-3 py-2.5 text-xs">
+            <div className="border-border text-muted-foreground shrink-0 space-y-0.5 border-t px-3 py-2.5 text-xs">
               <div className="flex justify-between">
                 <span>Type</span>
                 <span className="text-foreground font-medium">{xdna.header.sequenceType}</span>
@@ -259,7 +259,7 @@ function App() {
                   </div>
 
                   <div className="border-border flex items-center gap-1 border-l px-2">
-                    <Search size={11} className="text-muted-foreground flex-shrink-0" />
+                    <Search size={11} className="text-muted-foreground shrink-0" />
                     <input
                       type="text"
                       value={search}
@@ -287,7 +287,7 @@ function App() {
             {!xdna && !loading && !error && (
               <div
                 className={cn(
-                  'drop-zone flex flex-col items-center justify-center gap-4 h-full min-h-[400px]',
+                  'drop-zone flex flex-col items-center justify-center gap-4 h-full min-h-100',
                   dragOver && 'drag-over',
                 )}
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -312,7 +312,7 @@ function App() {
 
             {/* Loading */}
             {loading && (
-              <div className="flex h-full min-h-[400px] flex-col items-center justify-center gap-3">
+              <div className="flex h-full min-h-100 flex-col items-center justify-center gap-3">
                 <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
                 <p className="text-muted-foreground text-sm">Parsing file…</p>
               </div>
@@ -320,7 +320,7 @@ function App() {
 
             {/* Error */}
             {error && !loading && (
-              <div className="flex h-full min-h-[300px] flex-col items-center justify-center gap-4">
+              <div className="flex h-full min-h-75 flex-col items-center justify-center gap-4">
                 <div className="bg-destructive/10 rounded-full p-4">
                   <AlertCircle size={28} className="text-destructive" />
                 </div>
@@ -427,7 +427,7 @@ function InfoGrid({ rows }: { rows: [string, string][] }) {
     <div className="border-border divide-border divide-y overflow-hidden rounded-md border text-sm">
       {rows.map(([label, value]) => (
         <div key={label} className="flex">
-          <span className="bg-muted/40 text-muted-foreground w-36 flex-shrink-0 px-3 py-2 text-xs font-medium">
+          <span className="bg-muted/40 text-muted-foreground w-36 shrink-0 px-3 py-2 text-xs font-medium">
             {label}
           </span>
           <span className="text-foreground flex-1 px-3 py-2 font-mono text-xs break-all">{value}</span>

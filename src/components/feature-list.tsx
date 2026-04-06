@@ -55,26 +55,26 @@ export function FeatureList({ features, selectedFeature, onSelectFeature }: Prop
               }}
             >
               {/* Color swatch */}
-              <span className="h-3 w-3 flex-shrink-0 rounded-sm" style={{ background: color }} />
+              <span className="h-3 w-3 shrink-0 rounded-sm" style={{ background: color }} />
 
               {/* Name */}
               <span className="min-w-0 flex-1 truncate font-medium">{f.name || '(unnamed)'}</span>
 
               {/* Strand arrow */}
-              <span className="text-muted-foreground flex-shrink-0">
+              <span className="text-muted-foreground shrink-0">
                 {f.flags.strand === 'forward' ? <ArrowRight size={12} /> : <ArrowLeft size={12} />}
               </span>
 
               {/* Visibility */}
               {!f.flags.visible && (
-                <span className="text-muted-foreground flex-shrink-0">
+                <span className="text-muted-foreground shrink-0">
                   <EyeOff size={12} />
                 </span>
               )}
 
               {/* Expand chevron */}
               <button
-                className="text-muted-foreground hover:text-foreground flex-shrink-0 rounded p-0.5"
+                className="text-muted-foreground hover:text-foreground shrink-0 rounded p-0.5"
                 onClick={(e) => {
                   e.stopPropagation();
                   setExpanded(isExpanded ? null : f.index);
