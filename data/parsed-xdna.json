@@ -1,0 +1,313 @@
+{
+  "file": {
+    "size": 8359,
+    "format": "XDNA"
+  },
+  "header": {
+    "version": 0,
+    "sequenceType": "DNA",
+    "rawSequenceType": 1,
+    "topology": "circular",
+    "rawTopology": 1,
+    "sequenceLength": 6644,
+    "negativeLength": 0,
+    "commentLength": 144,
+    "terminator": 255
+  },
+  "offsets": {
+    "header": {
+      "start": 0,
+      "end": 112
+    },
+    "sequence": {
+      "start": 112,
+      "end": 6756
+    },
+    "comment": {
+      "start": 6756,
+      "end": 6900
+    },
+    "annotations": {
+      "start": 6900,
+      "end": 8359
+    }
+  },
+  "sequence": "ccaggaaccgtaaaaaggccgcgttgctggcgtttttccataggctccgcccccctgacgagcatcacaaaaatcgacgctcaagtcagaggtggcgaaacccgacaggactataaagataccaggcgtttccccctggaagctccctcgtgcgctctcctgttccgaccctgccgcttaccggatacctgtccgcctttctcccttcgggaagcgtggcgctttctcaatgctcacgctgtaggtatctcagttcggtgtaggtcgttcgctccaagctgggctgtgtgcacgaaccccccgttcagcccgaccgctgcgccttatccggtaactatcgtcttgagtccaacccggtaagacacgacttatcgccactggcagcagccactggtaacaggattagcagagcgaggtatgtaggcggtgctacagagttcttgaagtggtggcctaactacggctacactagaaggacagtatttggtatctgcgctctgctgaagccagttaccttcggaaaaagagttggtagctcttgatccggcaaacaaaccaccgctggtagcggtggtttttttgtttgcaagcagcagattacgcgcagaaaaaaaggatctcaagaagatcctttgatcttttctacggggtctgacgctcagtggaacgaaaactcacgttaagggattttggtcatgagattatcaaaaaggatcttcacctagatccttttaaattaaaaatgaagttttaaatcaatctaaagtatatatgagtaaacttggtctgacagttaccaatgcttaatcagtgaggcacctatctcagcgatctgtctatttcgttcatccatagttgcctgactccccgtcgtgtagataactacgatacgggagggcttaccatctggccccagtgctgcaatgataccgcgagacccacgctcaccggctccagatttatcagcaataaaccagccagccggaagggccgagcgcagaagtggtcctgcaactttatccgcctccatccagtctattaattgttgccgggaagctagagtaagtagttcgccagttaatagtttgcgcaacgttgttgccattgctacaggcatcgtggtgtcacgctcgtcgtttggtatggcttcattcagctccggttcccaacgatcaaggcgagttacatgatcccccatgttgtgcaaaaaagcggttagctccttcggtcctccgatcgttgtcagaagtaagttggccgcagtgttatcactcatggttatggcagcactgcataattctcttactgtcatgccatccgtaagatgcttttctgtgactggtgagtactcaaccaagtcattctgagaatagtgtatgcggcgaccgagttgctcttgcccggcgtcaatacgggataataccgcgccacatagcagaactttaaaagtgctcatcattggaaaacgttcttcggggcgaaaactctcaaggatcttaccgctgttgagatccagttcgatgtaacccactcgtgcacccaactgatcttcagcatcttttactttcaccagcgtttctgggtgagcaaaaacaggaaggcaaaatgccgcaaaaaagggaataagggcgacacggaaatgttgaatactcatactcttcctttttcaatattattgaagcatttatcagggttattgtctcatgagcggatacatatttgaatgtatttagaaaaataaacaaataggggttccgcgcacatttccccgaaaagtgccacctggtcgaccagaggtgtaaagtacttgagtaattttacttgattactgtacttaagtattatttttggggatttttactttacttgagtacaattaaaaatcaatacttttacttttacttaattacatttttttagaaaaaaaagtactttttactccttacaattttatttacagtcaaaaagtacttattttttggagatcacttgtcgacattgattattgACTAGTtattaTGTTGATTGTTGTTGGGCTTTGGGGAAGTGTCGCGTATATTCATTGTTAACATTTCCTGGTACGGTTTACGAGGAGTGCCTTAATTATTATTACTCTATACTAAACTATACAGTCGACAATAAAGTTACTGTATTACGTGGCATTGGCGACCCAAAACGAAAATGGGGGGCGGCAATCTCGGTACCGTCCCGTAACATTTATCTTCTAATCATATCGGAAATACACTTACTGCTCACATTCCAAATCACACTTTACCCTAGGGGATGAACCTAAAAAGGATCGTTCCGTTACATTCACGGTGCTGTTGGCTGTATGGTTGGACCCTGGTGTATGACTTGTGTGTGTTGTCTGTGTGTGTGTATATGTCTGAATGGGTTTCCATATCCATATCTGATGTTACGAATTATGGGCACGTTGGATTGGTAAGCGAGCGTGCCCTCCCCGGTGGTGACCGGCTCTTCGCCGGGTGGCGCGTATATTTGACGTGTACATGATGCACACAGAATATTTGGCGGGCCGATATGGCGGGCCAATAGGGACCAAATGACCGTTATCACGTGGTGCAGGACTCTTTACCATAGAACCGCGTGACCCAAAGGAAACAATCCATATAAGGGCATGGGCGGAGCCAGACGCGCCATTGGCTGCATACATTCAAATTCCGCCCCTCTGAAGCATCCGATGCCATTGAAGCATCGAGATACGAAGACCCTCTTATAAATGGTTTTGTGAACTCTCCGCCAGAGCCGGTAGACATCTTTTCCAAATCAGTCAGTTCCAGCACCGACGCCACCCGGATTCCCCCGTCATCGCATCGCTGTTCGCTATTCATCCCTGCGCTATTTTTCACTTTAGTTTCGCGTAATCCCTCAGAACAGTCGCAGAATTCCGCCACCatgcagaatcctaccggacccagctatccgctcgcctcactctatgtcggcgacctccatcccgacgtgacggaggccatgctctttgagaagttctccactgccggccaggtgctctccatccgcgtctgccgggacatgatgacacggcgctctttaggttatgcgtacgtgaacttccagctgcccgctgatgctgaacgagccatggacagcatgaattacgactcaatgaagggccgtcctgtacgcattatgtggtcacagcgtgatccctcgctgcgtcgttccggcttcggtaacatcttcatcaagaatctggacaagtccatcgacaacaagtccatgtatgacaccttctccggcttcggagccattctctcgtgcaaggtcgcacaagatgagaccggtggtagccgcggctacgctttcgtccactttgagctggaaagctcggctcagagcgccatcgataaggtcaacggcatgttgctgaacggcaagaaagtgtttgtcggccgtttcattccccggaccgagcgtgaccgcaattacggcgatgctccccgcaaattcaccaacgtgttcgtgaagaactttggcgacgacatggacgacgacaagctgaagaccatgtttgagaagtacggtgccatctctagccaccgtgttatggtggatgagaacggcaagtcgcgtggatttggctttgtcagctttgagacaccggaagccgctgaagaggctgtgaatgaactgaacggcactcccctccccggtgccgatggacagcaggctcgtcctttgtttgtggggcgagcgcagaagcgtgcggagcgccagcaggaactgcgccgccagtttgatctgaagcgtcaggaacgccagaaccgctacatgggcgtcaacttgtacgtcaagaacttggatgagaccatcgatgatgagacgctgaagaaggagtttgcccatatcgggcagatcaacagcgctaagatcatgcgcgaaggtggacgttccaagggtttcggctttgtctgcttcaatacccccgaagaggccagcaaggccgtccaggagctgaacggcaaagttctgggcaacaagccgctctacgtcgccatggcccaacgcaaggaggagcgccgcaccgtgatggcccagcaaatgatgtcgcgctttgtgccgcagcccttcaaccagcgtgccggcccgatgggccccggcggtcaaatgttcccgcagggacccggaatgcagggccagatggcgcctcccttcctctacccggccaacatggcccaggcgcagcgggccttcttcccggccggcggacagatgggccagatgggcggtccaatgggtatgatgcgaccggctcgctggaacaaccagggccagtatgcgccacgcggacaaggccagcccggtccgtatgggcagatgccgcagcagggcggcccgggtggcctgccacaagggcaggggggattccgcggacagggaccgcgtgggatgcgaccgcagggtggaccgttgggaccacgcggaatgcagcccggtggtggggtcggagcgcagggaatgggacagattccgcaacagcaaggcggccccaacgcgatgcagcaacagcagggacctccgcgtccccagcagaacgggctgagcggaccggctgccggtggtctgcgtagcggtgccccgagcttcatccgtcaggccggacagcccatgcctcgcggggctgctcctgccgcacatcccccgcagaacatcagtggaattgatcccgctcagctggccaaggcgtcttccaacgagcagaagcagattctcggcgagaagctcttccccctgatttccacctcgtatcccgaattggccggcaaggttactggcatgctgctggagattgacaactctgagctgctgttgatgttggagcaaccggaacagttgaagagcaaggtcgacgaagccgtgctggtgttgaagtctcatctgaaccaggcgcccggagctggaagtgccacggccgtcactgccgccgccgctggaaagaccggagctggcgacaatgccatcaagcaggatgccggccagaagggGAATTCCGCcaccatggtgagcaagggcgaggaggataacatggcctctctcccagcgacacatgagttacacatctttggctccatcaacggtgtggactttgacatggtgggtcagggcaccggcaatccaaatgatggttatgaggagttaaacctgaagtccaccaagggtgacctccagttctccccctggattctggtccctcatatcgggtatggcttccatcagtacctgccctaccctgacgggatgtcgcctttccaggccgctatggtagatggctccggataccaagtccatcgcacaatgcagtttgaagatggtgcctcccttactgttaactaccgctacacctacgagggaagccacatcaaaggagaggcccaggtgaaggggactggtttccctgctgacggtcctgtgatgaccaactcgctgaccgctgcggactggtgcaggtcgaagaagacttaccccaacgacaaaaccatcatcagtacctttaagtggagttacaccactggaaatggcaagcgctaccggagcactgcgcggaccacctacacctttgccaagccaatggcggctaactatctgaagaaccagccgatgtacgtgttccgtaagacggagctcaagcactccaagaccgagctcaacttcaaggagtggcaaaaggcctttaccgatgtgatgggcatggacgagctgtacaagtaaAgatctttttccctctgccaaaaattatggggacatcatgaagccccttgagcatctgacttctggctaataaaggaaatttattttcattgcaatagtgtgttggaattttttgtgtctctcactcggaaggacatatgggagggcaaatcatttaaaacatcagaatgagtatttggtttagagtttggcaacatatgccatatgctggctgccatgaacaaaggtggctataaagaggtcatcagtatatgaaacagccccctgctgtccattccttattccatagaaaagccttgacttgaggttagattttttttatattttgttttgtgttatttttttctttaacatccctaaaattttccttacatgttttactagccagatttttcctcctctcctgactactcccagtcatagctgtccctcttctcttatgaagatccctcgacctgcagcccaagcttgcggccgccttaaacaagaatctctagttttctttcttgcttttacttttacttccttaatactcaagtacaattttaatggagtacttttttacttttactcaagtaagattctagccagatacttttacttttaattgagtaaaattttccctaagtacttgtactttcacttgagtaaaatttttgagtactttttacacctctgatcgatggatccgctgcattaatgaatcggccaacgcgcggggagaggcggtttgcgtattgggcgctcttccgcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatacggttatccacagaatcaggggataacgcaggaaagaacatgtgagcaaaaggccagcaaaagg",
+  "comment": "Homologous recombination reaction between [045mNeon Tol2+promHeAct.xdna] as a target sequence  and [Sequence Window #3] as an inserted sequence.",
+  "annotations": {
+    "marker": 0,
+    "rightOverhang": {
+      "side": "right",
+      "type": "none",
+      "declaredLength": 0,
+      "sequence": ""
+    },
+    "leftOverhang": {
+      "side": "left",
+      "type": "none",
+      "declaredLength": 0,
+      "sequence": ""
+    },
+    "featureCount": 13,
+    "features": [
+      {
+        "index": 1,
+        "name": "FwseqMA",
+        "description": "note=\"direct strand translation\"translation=\"LQFYLQX\"",
+        "descriptionLines": [
+          "note=\"direct strand translation\"translation=\"LQFYLQX\""
+        ],
+        "type": "misc_feature",
+        "start": 1943,
+        "end": 1962,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 1,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "189,5,184,"
+      },
+      {
+        "index": 2,
+        "name": "PromHeAct [5'] [*]",
+        "description": "note=\"direct strand translation\"translation=\"TSYYVDCCWALGKCRVYSLLTFPGTVYEECLNYYYSILNYTVDNKVTVLRGIGDPKRKWGAAISVPSRNIYLLIISEIHLLLTFQITLYPRG*\"https://genome.ucsc.edu/cgi-bin/hgTracks?db=hub_3041419_GCA_002082055.1&lastVirtModeType=default&lastVirtModeExtr",
+        "descriptionLines": [
+          "note=\"direct strand translation\"translation=\"TSYYVDCCWALGKCRVYSLLTFPGTVYEECLNYYYSILNYTVDNKVTVLRGIGDPKRKWGAAISVPSRNIYLLIISEIHLLLTFQITLYPRG*\"https://genome.ucsc.edu/cgi-bin/hgTracks?db=hub_3041419_GCA_002082055.1&lastVirtModeType=default&lastVirtModeExtr"
+        ],
+        "type": "misc_feature",
+        "start": 2009,
+        "end": 2797,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 1,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "27,0,191,"
+      },
+      {
+        "index": 3,
+        "name": "PromHeAct [5'] [*]",
+        "description": "note=\"direct strand translation\"translation=\"TSYYVDCCWALGKCRVYSLLTFPGTVYEECLNYYYSILNYTVDNKVTVLRGIGDPKRKWGAAISVPSRNIYLLIISEIHLLLTFQITLYPRG*\"https://genome.ucsc.edu/cgi-bin/hgTracks?db=hub_3041419_GCA_002082055.1&lastVirtModeType=default&lastVirtModeExtr",
+        "descriptionLines": [
+          "note=\"direct strand translation\"translation=\"TSYYVDCCWALGKCRVYSLLTFPGTVYEECLNYYYSILNYTVDNKVTVLRGIGDPKRKWGAAISVPSRNIYLLIISEIHLLLTFQITLYPRG*\"https://genome.ucsc.edu/cgi-bin/hgTracks?db=hub_3041419_GCA_002082055.1&lastVirtModeType=default&lastVirtModeExtr"
+        ],
+        "type": "misc_feature",
+        "start": 2798,
+        "end": 2867,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 1,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "27,0,191,"
+      },
+      {
+        "index": 4,
+        "name": "ColE1 origin",
+        "description": "",
+        "descriptionLines": [],
+        "type": "rep_origin",
+        "start": 645,
+        "end": 17,
+        "flags": {
+          "strand": "reverse",
+          "rawStrand": 0,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 0,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "70,130,180,"
+      },
+      {
+        "index": 5,
+        "name": "AmpR",
+        "description": "",
+        "descriptionLines": [],
+        "type": "CDS",
+        "start": 1456,
+        "end": 797,
+        "flags": {
+          "strand": "reverse",
+          "rawStrand": 0,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 0,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "143,188,143,"
+      },
+      {
+        "index": 6,
+        "name": "Amp prom",
+        "description": "",
+        "descriptionLines": [],
+        "type": "Promoter",
+        "start": 1724,
+        "end": 1696,
+        "flags": {
+          "strand": "reverse",
+          "rawStrand": 0,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 0,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "70,130,180,"
+      },
+      {
+        "index": 7,
+        "name": "beta-globin-polyA signal",
+        "description": "",
+        "descriptionLines": [],
+        "type": "misc_feature",
+        "start": 4233,
+        "end": 4288,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 0,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "255,128,64,"
+      },
+      {
+        "index": 8,
+        "name": "3'Tol2",
+        "description": "",
+        "descriptionLines": [],
+        "type": "misc_feature",
+        "start": 1792,
+        "end": 1991,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 1,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "255,128,64,"
+      },
+      {
+        "index": 9,
+        "name": "5'Tol2",
+        "description": "",
+        "descriptionLines": [],
+        "type": "misc_feature",
+        "start": 4645,
+        "end": 4842,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 1,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "255,128,64,"
+      },
+      {
+        "index": 10,
+        "name": "insert from PCR(5'UTRHeACtfin-mNeongreen.xdna)",
+        "description": "note=\"Fragment extracted from PCR(5'UTRHeACtfin-mNeongreen.xdna) [720  nt] : (EcoRI[21] / BglII[745])",
+        "descriptionLines": [
+          "note=\"Fragment extracted from PCR(5'UTRHeACtfin-mNeongreen.xdna) [720  nt] : (EcoRI[21] / BglII[745])"
+        ],
+        "type": "",
+        "start": 3446,
+        "end": 4165,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 1,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "132,164,192,"
+      },
+      {
+        "index": 11,
+        "name": "linker GGS",
+        "description": "",
+        "descriptionLines": [],
+        "type": "misc_feature",
+        "start": 3549,
+        "end": 3557,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 0,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "189,0,152,"
+      },
+      {
+        "index": 12,
+        "name": "mNeongreen",
+        "description": "",
+        "descriptionLines": [],
+        "type": "misc_feature",
+        "start": 3454,
+        "end": 4161,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 0,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "177,238,45,"
+      },
+      {
+        "index": 13,
+        "name": "Insert from Sequence Window #3",
+        "description": "note=\"Fragment inserted from Sequence Window #3 into 045mNeon Tol2+promHeAct.xdna by homologous recombination",
+        "descriptionLines": [
+          "note=\"Fragment inserted from Sequence Window #3 into 045mNeon Tol2+promHeAct.xdna by homologous recombination"
+        ],
+        "type": "",
+        "start": 2844,
+        "end": 3471,
+        "flags": {
+          "strand": "forward",
+          "rawStrand": 1,
+          "visible": true,
+          "rawVisible": 1,
+          "unknown": 1,
+          "arrow": true,
+          "rawArrow": 1
+        },
+        "color": "132,164,192,"
+      }
+    ],
+    "trailingBytes": 0
+  }
+}
