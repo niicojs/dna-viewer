@@ -1,5 +1,5 @@
 {
-  "name": "dna",
+  "name": "nico-dna",
   "private": true,
   "type": "module",
   "imports": {
@@ -36,8 +36,6 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/devtools-vite": "latest",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/react": "^16.3.0",
     "@types/node": "^25.5.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
@@ -58,12 +56,10 @@
     },
     "peerDependencyRules": {
       "allowAny": [
-        "vite",
-        "vitest"
+        "vite"
       ],
       "allowedVersions": {
-        "vite": "*",
-        "vitest": "*"
+        "vite": "*"
       }
     }
   }
