@@ -296,7 +296,6 @@ export function parseXdnaBuffer(buffer: ArrayBuffer, fileName = 'unknown.xdna'):
     annotations,
   };
 }
-
 export function parseDnaText(text: string, fileName = 'unknown.txt', fileSize = text.length): XdnaFile {
   const sequence = text.replace(/\s+/g, '').toUpperCase();
 

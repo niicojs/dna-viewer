@@ -5,6 +5,7 @@ import {
   Dna,
   List,
   Info,
+  ScanSearch,
   Sun,
   Moon,
   Monitor,
@@ -20,19 +21,18 @@ import { useCallback, useRef, useState } from 'react';
 import type { ExternalSelection, Selection } from 'seqviz/dist/selectionContext';
 
 import { FeatureList } from '#/components/feature-list';
+import { KnownSequenceScan } from '#/components/known-sequence-scan';
 import { SeqVizViewer } from '#/components/seqviz-viewer';
 import { Button } from '#/components/ui/button';
+import type { KnownSequenceHit } from '#/lib/known-sequence-scan';
 import { useTheme, type Theme } from '#/lib/use-theme';
 import { cn } from '#/lib/utils';
-import type { Feature } from '#/lib/xdna-parser';
-import { readSequenceFile } from '#/lib/xdna-parser';
-import { serializeDNAFile } from '#/lib/xdna-parser';
-import type { XdnaFile } from '#/lib/xdna-parser';
+import { readSequenceFile, serializeDNAFile, type XdnaFile, type Feature } from '#/lib/xdna-parser';
 
 export const Route = createFileRoute('/')({ component: App });
 
 type ViewerMode = 'circular' | 'linear' | 'both';
-type Tab = 'viewer' | 'info';
+type Tab = 'viewer' | 'info' | 'scanner';
 
 function updateFeatures(xdna: XdnaFile, updater: (features: Feature[]) => Feature[]): XdnaFile {
   const current_annotations = xdna.annotations ?? {
@@ -102,6 +102,37 @@ function createFeature(sequence_length: number, index: number, selection?: Selec
 
 function getDownloadName(file_name: string) {
   return file_name.replace(/\.(xdna|txt)$/i, '') + '.xdna';
+}
+
+function createKnownSequenceFeature(sequence_length: number, index: number, hit: KnownSequenceHit): Feature {
+  const start = Math.max(1, Math.min(sequence_length, hit.start));
+  const end = Math.max(1, Math.min(sequence_length, hit.end));
+
+  return {
+    index,
+    name: hit.name,
+    description: `${hit.description}\rCategory: ${hit.category}\rKind: ${hit.kind}\rMatched: ${hit.matched_sequence}${hit.frame ? `\rFrame: ${hit.frame}` : ''}`,
+    descriptionLines: [
+      hit.description,
+      `Category: ${hit.category}`,
+      `Kind: ${hit.kind}`,
+      `Matched: ${hit.matched_sequence}`,
+      ...(hit.frame ? [`Frame: ${hit.frame}`] : []),
+    ],
+    type: hit.feature_type,
+    start,
+    end,
+    flags: {
+      strand: hit.strand,
+      rawStrand: hit.strand === 'forward' ? 1 : 0,
+      visible: true,
+      rawVisible: 1,
+      unknown: 0,
+      arrow: true,
+      rawArrow: 1,
+    },
+    color: hit.color,
+  };
 }
 
 function App() {
@@ -275,6 +306,47 @@ function App() {
     URL.revokeObjectURL(url);
   }, [xdna]);
 
+  const handleKnownSequencePreview = useCallback((hit: KnownSequenceHit) => {
+    setSelectedFeature({
+      start: hit.start,
+      end: hit.end,
+      name: hit.name,
+      type: hit.feature_type as any,
+      clockwise: hit.strand !== 'reverse',
+    });
+    setActiveTab('viewer');
+  }, []);
+
+  const handleKnownSequenceAdd = useCallback(
+    (hit: KnownSequenceHit) => {
+      if (!xdna) {
+        return;
+      }
+
+      const next_index = features.reduce((max, feature) => Math.max(max, feature.index), 0) + 1;
+      const next_feature = createKnownSequenceFeature(xdna.header.sequenceLength, next_index, hit);
+
+      setXdna((current) => {
+        if (!current) {
+          return current;
+        }
+
+        return updateFeatures(current, (current_features) => [...current_features, next_feature]);
+      });
+
+      setSelectedFeature({
+        start: next_feature.start,
+        end: next_feature.end,
+        name: next_feature.name,
+        type: next_feature.type as any,
+        clockwise: next_feature.flags.strand !== 'reverse',
+      });
+      setFeatureToEdit(next_index);
+      setActiveTab('viewer');
+    },
+    [features, xdna],
+  );
+
   const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;
   const nextTheme: Theme = theme === 'auto' ? 'light' : theme === 'light' ? 'dark' : 'auto';
 
@@ -385,6 +457,13 @@ function App() {
               <button className={cn('app-tab', activeTab === 'info' && 'active')} onClick={() => setActiveTab('info')}>
                 <Info size={12} />
                 Info
+              </button>
+              <button
+                className={cn('app-tab', activeTab === 'scanner' && 'active')}
+                onClick={() => setActiveTab('scanner')}
+              >
+                <ScanSearch size={12} />
+                Sequence Scan
               </button>
 
               {activeTab === 'viewer' && (
@@ -595,6 +674,14 @@ function App() {
                   </section>
                 )}
               </div>
+            )}
+
+            {xdna && activeTab === 'scanner' && (
+              <KnownSequenceScan
+                xdna={xdna}
+                onPreviewHit={handleKnownSequencePreview}
+                onAddHit={handleKnownSequenceAdd}
+              />
             )}
           </div>
         </main>
