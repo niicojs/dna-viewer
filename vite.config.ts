@@ -6,7 +6,13 @@ import { nitro } from 'nitro/vite';
 import { defineConfig } from 'vite-plus';
 
 const config = defineConfig({
-  fmt: { singleQuote: true, printWidth: 120, sortImports: true, sortTailwindcss: true },
+  fmt: {
+    singleQuote: true,
+    printWidth: 120,
+    sortImports: true,
+    sortTailwindcss: true,
+    ignorePatterns: ['routeTree.gen.ts'],
+  },
   lint: { options: { typeAware: true, typeCheck: true } },
   resolve: { tsconfigPaths: true },
   plugins: [

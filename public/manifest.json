@@ -3,24 +3,24 @@
   "name": "XDNA Viewer",
   "icons": [
     {
-      "src": "favicon.svg",
+      "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "logo192.svg",
-      "type": "image/svg+xml",
+      "src": "icon-192.png",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.svg",
-      "type": "image/svg+xml",
+      "src": "icon-512.png",
+      "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#0d1f2d",
-  "background_color": "#0d1f2d"
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a"
 }
