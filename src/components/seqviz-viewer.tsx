@@ -39,7 +39,7 @@ export function SeqVizViewer({ xdna, viewer = 'circular', selection, onSelection
         name={name}
         seq={seq}
         annotations={annotations}
-        viewer={viewer === 'both' ? 'both' : viewer}
+        viewer={viewer}
         // seqviz doesn't have a topology prop — circular is implied by viewer="circular"
         // For linear topology we still use circular viewer mode as seqviz always supports it
         showComplement={viewer !== 'circular'}
