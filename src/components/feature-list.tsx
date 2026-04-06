@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowLeft, EyeOff, ChevronDown, ChevronRight } from 'lucide-react';
+import { ArrowRight, ArrowLeft, EyeOff, ChevronDown, ChevronRight, Pencil } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { cn } from '#/lib/utils';
@@ -22,6 +22,7 @@ type Props = {
   selectedFeature: number | null;
   onSelectFeature: (index: number | null) => void;
   onUpdateFeature: (index: number, next_feature: Feature) => void;
+  onDeleteFeature: (index: number) => void;
   autoEditFeature?: number | null;
   onAutoEditHandled?: () => void;
 };
@@ -37,7 +38,7 @@ type FeatureDraft = {
   description: string;
 };
 
-function feature_to_draft(feature: Feature): FeatureDraft {
+function featureToDraft(feature: Feature): FeatureDraft {
   return {
     name: feature.name,
     type: feature.type,
@@ -50,19 +51,19 @@ function feature_to_draft(feature: Feature): FeatureDraft {
   };
 }
 
-function normalize_description_lines(description: string): string[] {
+function normalizeDescriptionLines(description: string): string[] {
   return description
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean);
 }
 
-function parse_position(value: string, fallback: number) {
+function parsePosition(value: string, fallback: number) {
   const parsed = Number.parseInt(value.trim(), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function color_string_to_hex(color: string) {
+function colorStringToHex(color: string) {
   const parts = color
     .split(',')
     .map((part) => Number.parseInt(part.trim(), 10))
@@ -78,7 +79,7 @@ function color_string_to_hex(color: string) {
     .join('')}`;
 }
 
-function hex_to_color_string(value: string) {
+function hexToColorString(value: string) {
   const normalized = value.replace('#', '');
   if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
     return '150,150,150,';
@@ -92,6 +93,7 @@ export function FeatureList({
   selectedFeature,
   onSelectFeature,
   onUpdateFeature,
+  onDeleteFeature,
   autoEditFeature,
   onAutoEditHandled,
 }: Props) {
@@ -113,7 +115,7 @@ export function FeatureList({
       return;
     }
 
-    setDraft(feature_to_draft(feature));
+    setDraft(featureToDraft(feature));
   }, [editing, feature_by_index]);
 
   useEffect(() => {
@@ -134,7 +136,7 @@ export function FeatureList({
   function start_edit(feature: Feature) {
     setExpanded(feature.index);
     setEditing(feature.index);
-    setDraft(feature_to_draft(feature));
+    setDraft(featureToDraft(feature));
   }
 
   function cancel_edit() {
@@ -147,13 +149,13 @@ export function FeatureList({
       return;
     }
 
-    const description_lines = normalize_description_lines(draft.description);
+    const description_lines = normalizeDescriptionLines(draft.description);
     const next_feature: Feature = {
       ...feature,
       name: draft.name.trim(),
       type: draft.type.trim(),
-      start: parse_position(draft.start, feature.start),
-      end: parse_position(draft.end, feature.end),
+      start: parsePosition(draft.start, feature.start),
+      end: parsePosition(draft.end, feature.end),
       description: description_lines.join('\r'),
       descriptionLines: description_lines,
       color: draft.color.trim() || feature.color,
@@ -203,13 +205,13 @@ export function FeatureList({
               {/* Color swatch */}
               <span className="h-3 w-3 shrink-0 rounded-sm" style={{ background: color }} />
 
-              {/* Name */}
-              <span className="min-w-0 flex-1 truncate font-medium">{f.name || '(unnamed)'}</span>
-
               {/* Strand arrow */}
               <span className="text-muted-foreground shrink-0">
                 {f.flags.strand === 'forward' ? <ArrowRight size={12} /> : <ArrowLeft size={12} />}
               </span>
+
+              {/* Name */}
+              <span className="min-w-0 flex-1 truncate font-medium">{f.name || '(unnamed)'}</span>
 
               {/* Visibility */}
               {!f.flags.visible && (
@@ -221,13 +223,14 @@ export function FeatureList({
               {/* Expand chevron */}
               <button
                 type="button"
-                className="text-muted-foreground hover:text-foreground shrink-0 rounded px-1 text-xs"
+                className="text-muted-foreground hover:text-foreground shrink-0 rounded p-1"
+                title="Edit feature"
                 onClick={(e) => {
                   e.stopPropagation();
                   start_edit(f);
                 }}
               >
-                Edit
+                <Pencil size={13} />
               </button>
 
               <button
@@ -305,8 +308,8 @@ export function FeatureList({
                         <span className="text-foreground/70 font-semibold">Color</span>
                         <input
                           type="color"
-                          value={color_string_to_hex(draft.color)}
-                          onChange={(e) => setDraft({ ...draft, color: hex_to_color_string(e.target.value) })}
+                          value={colorStringToHex(draft.color)}
+                          onChange={(e) => setDraft({ ...draft, color: hexToColorString(e.target.value) })}
                           className="border-border bg-background h-9 w-full rounded border px-1 py-1"
                         />
                       </label>
@@ -331,6 +334,13 @@ export function FeatureList({
                     </label>
 
                     <div className="flex justify-end gap-2 pt-1">
+                      <button
+                        type="button"
+                        className="border-destructive/40 text-destructive hover:bg-destructive/10 mr-auto rounded border px-2 py-1"
+                        onClick={() => onDeleteFeature(f.index)}
+                      >
+                        Delete
+                      </button>
                       <button
                         type="button"
                         className="border-border hover:bg-background rounded border px-2 py-1"

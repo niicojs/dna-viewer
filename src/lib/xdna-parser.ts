@@ -26,7 +26,7 @@ function readLatin1(view: DataView, start: number, end: number): string {
   return decoder.decode(new Uint8Array(view.buffer, view.byteOffset + start, end - start));
 }
 
-function encode_latin1(value: string, label: string): Uint8Array {
+function encodeLatin1(value: string, label: string): Uint8Array {
   const bytes = new Uint8Array(value.length);
 
   for (let index = 0; index < value.length; index += 1) {
@@ -41,8 +41,8 @@ function encode_latin1(value: string, label: string): Uint8Array {
   return bytes;
 }
 
-function encode_pascal_string(value: string, label: string): Uint8Array {
-  const bytes = encode_latin1(value, label);
+function encodePascalString(value: string, label: string): Uint8Array {
+  const bytes = encodeLatin1(value, label);
   if (bytes.length > 0xff) {
     fail(`${label} is too long for XDNA (${bytes.length} bytes, max 255)`);
   }
@@ -53,7 +53,7 @@ function encode_pascal_string(value: string, label: string): Uint8Array {
   return result;
 }
 
-function write_uint32_be(target: Uint8Array, offset: number, value: number) {
+function writeUint32Be(target: Uint8Array, offset: number, value: number) {
   new DataView(target.buffer, target.byteOffset, target.byteLength).setUint32(offset, value, false);
 }
 
@@ -384,8 +384,8 @@ function normalizeOverhangLength(overhang: Overhang): number {
 
 function serializeOverhang(overhang: Overhang, label: string): Uint8Array {
   const declared_length = normalizeOverhangLength(overhang);
-  const length_field = encode_pascal_string(String(declared_length), `${label} length`);
-  const sequence = declared_length === 0 ? new Uint8Array(0) : encode_latin1(overhang.sequence, `${label} sequence`);
+  const length_field = encodePascalString(String(declared_length), `${label} length`);
+  const sequence = declared_length === 0 ? new Uint8Array(0) : encodeLatin1(overhang.sequence, `${label} sequence`);
 
   if (Math.abs(declared_length) !== sequence.length) {
     fail(`${label} length does not match its sequence`);
@@ -399,13 +399,13 @@ function serializeOverhang(overhang: Overhang, label: string): Uint8Array {
 
 function serializeFeature(feature: Feature, index: number): Uint8Array {
   const parts = [
-    encode_pascal_string(feature.name, `feature ${index} name`),
-    encode_pascal_string(feature.description, `feature ${index} description`),
-    encode_pascal_string(feature.type, `feature ${index} type`),
-    encode_pascal_string(String(feature.start), `feature ${index} start`),
-    encode_pascal_string(String(feature.end), `feature ${index} end`),
+    encodePascalString(feature.name, `feature ${index} name`),
+    encodePascalString(feature.description, `feature ${index} description`),
+    encodePascalString(feature.type, `feature ${index} type`),
+    encodePascalString(String(feature.start), `feature ${index} start`),
+    encodePascalString(String(feature.end), `feature ${index} end`),
     Uint8Array.of(feature.flags.rawStrand, feature.flags.rawVisible, feature.flags.unknown, feature.flags.rawArrow),
-    encode_pascal_string(feature.color, `feature ${index} color`),
+    encodePascalString(feature.color, `feature ${index} color`),
   ];
 
   const total_length = parts.reduce((sum, part) => sum + part.length, 0);
@@ -421,8 +421,8 @@ function serializeFeature(feature: Feature, index: number): Uint8Array {
 }
 
 export function serializeDNAFile(xdna: XdnaFile): Uint8Array {
-  const sequence = encode_latin1(xdna.sequence, 'sequence');
-  const comment = encode_latin1(xdna.comment, 'comment');
+  const sequence = encodeLatin1(xdna.sequence, 'sequence');
+  const comment = encodeLatin1(xdna.comment, 'comment');
   const annotations = xdna.annotations;
   const features = annotations?.features ?? [];
 
@@ -447,9 +447,9 @@ export function serializeDNAFile(xdna: XdnaFile): Uint8Array {
   result[0] = xdna.header.version;
   result[1] = xdna.header.rawSequenceType;
   result[2] = xdna.header.rawTopology;
-  write_uint32_be(result, 28, sequence.length);
-  write_uint32_be(result, 32, xdna.header.negativeLength);
-  write_uint32_be(result, 96, comment.length);
+  writeUint32Be(result, 28, sequence.length);
+  writeUint32Be(result, 32, xdna.header.negativeLength);
+  writeUint32Be(result, 96, comment.length);
   result[111] = xdna.header.terminator;
 
   let offset = HEADER_SIZE;

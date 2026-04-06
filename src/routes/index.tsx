@@ -34,7 +34,7 @@ export const Route = createFileRoute('/')({ component: App });
 type ViewerMode = 'circular' | 'linear' | 'both';
 type Tab = 'viewer' | 'info';
 
-function update_features(xdna: XdnaFile, updater: (features: Feature[]) => Feature[]): XdnaFile {
+function updateFeatures(xdna: XdnaFile, updater: (features: Feature[]) => Feature[]): XdnaFile {
   const current_annotations = xdna.annotations ?? {
     marker: 0,
     rightOverhang: { side: 'right' as const, type: 'none' as const, declaredLength: 0, sequence: '' },
@@ -56,10 +56,28 @@ function update_features(xdna: XdnaFile, updater: (features: Feature[]) => Featu
   };
 }
 
-function create_feature(sequence_length: number, index: number, selection?: Selection): Feature {
+function selectionIsReverse(selection?: Selection) {
+  if (!selection) {
+    return false;
+  }
+
+  if (selection.clockwise != null) {
+    return selection.clockwise === false;
+  }
+
+  return selection.direction === -1;
+}
+
+function createRandomColor() {
+  const channel = () => Math.floor(Math.random() * 256);
+  return `${channel()},${channel()},${channel()},`;
+}
+
+function createFeature(sequence_length: number, index: number, selection?: Selection): Feature {
   const max_position = Math.max(sequence_length, 1);
   const start = selection?.start ? Math.max(1, selection.start) : 1;
   const end = selection?.end ? Math.max(1, selection.end) : max_position;
+  const is_reverse = selectionIsReverse(selection);
 
   return {
     index,
@@ -70,19 +88,19 @@ function create_feature(sequence_length: number, index: number, selection?: Sele
     start,
     end,
     flags: {
-      strand: selection?.clockwise === false ? 'reverse' : 'forward',
-      rawStrand: selection?.clockwise === false ? 0 : 1,
+      strand: is_reverse ? 'reverse' : 'forward',
+      rawStrand: is_reverse ? 0 : 1,
       visible: true,
       rawVisible: 1,
       unknown: 0,
       arrow: true,
       rawArrow: 1,
     },
-    color: '150,150,150,',
+    color: createRandomColor(),
   };
 }
 
-function get_download_name(file_name: string) {
+function getDownloadName(file_name: string) {
   return file_name.replace(/\.(xdna|txt)$/i, '') + '.xdna';
 }
 
@@ -168,7 +186,7 @@ function App() {
     (index: number, next_feature: Feature) => {
       setXdna((current) =>
         current
-          ? update_features(current, (current_features) =>
+          ? updateFeatures(current, (current_features) =>
               current_features.map((feature) => (feature.index === index ? next_feature : feature)),
             )
           : current,
@@ -193,7 +211,7 @@ function App() {
 
   const handleFeatureAdd = useCallback(() => {
     const next_index = features.reduce((max, feature) => Math.max(max, feature.index), 0) + 1;
-    const next_feature = xdna ? create_feature(xdna.header.sequenceLength, next_index, selectedFeature) : null;
+    const next_feature = xdna ? createFeature(xdna.header.sequenceLength, next_index, selectedFeature) : null;
 
     if (!next_feature) {
       return;
@@ -204,7 +222,7 @@ function App() {
         return current;
       }
 
-      return update_features(current, (current_features) => [...current_features, next_feature]);
+      return updateFeatures(current, (current_features) => [...current_features, next_feature]);
     });
     setFeatureToEdit(next_index);
 
@@ -216,6 +234,26 @@ function App() {
       clockwise: next_feature.flags.strand !== 'reverse',
     });
   }, [features, selectedFeature, xdna]);
+
+  const handleFeatureDelete = useCallback(
+    (index: number) => {
+      setXdna((current) =>
+        current
+          ? updateFeatures(current, (current_features) => current_features.filter((feature) => feature.index !== index))
+          : current,
+      );
+
+      setFeatureToEdit((current) => (current === index ? null : current));
+      setSelectedFeature((current_selection) => {
+        if (!current_selection || selectedFeatureIndex !== index) {
+          return current_selection;
+        }
+
+        return undefined;
+      });
+    },
+    [selectedFeatureIndex],
+  );
 
   const handleSave = useCallback(() => {
     if (!xdna) {
@@ -230,7 +268,7 @@ function App() {
     const link = document.createElement('a');
 
     link.href = url;
-    link.download = get_download_name(xdna.file.name);
+    link.download = getDownloadName(xdna.file.name);
     document.body.append(link);
     link.click();
     link.remove();
@@ -294,6 +332,7 @@ function App() {
                 selectedFeature={selectedFeatureIndex}
                 onSelectFeature={handleSidebarSelect}
                 onUpdateFeature={handleFeatureUpdate}
+                onDeleteFeature={handleFeatureDelete}
                 autoEditFeature={featureToEdit}
                 onAutoEditHandled={() => setFeatureToEdit(null)}
               />
