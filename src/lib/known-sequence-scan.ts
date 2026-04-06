@@ -3,6 +3,16 @@ import type { XdnaFile } from '#/lib/xdna-parser';
 export type KnownSequenceCategory = 'promoter' | 'tag' | 'terminator' | 'restriction_site';
 export type KnownSequenceKind = 'dna' | 'peptide';
 
+export type KnownSequenceTarget = {
+  name: string;
+  category: KnownSequenceCategory;
+  kind: KnownSequenceKind;
+  description: string;
+  sequence: string;
+  feature_type: string;
+  color: string;
+};
+
 export type KnownSequenceHit = {
   id: string;
   name: string;
@@ -37,7 +47,7 @@ type PeptideTarget = {
   color: string;
 };
 
-const dna_targets: DnaTarget[] = [
+const builtin_dna_targets: DnaTarget[] = [
   {
     name: 'SP6 promoter',
     category: 'promoter',
@@ -144,7 +154,7 @@ const dna_targets: DnaTarget[] = [
   },
 ];
 
-const peptide_targets: PeptideTarget[] = [
+const builtin_peptide_targets: PeptideTarget[] = [
   {
     name: '6xHis tag',
     category: 'tag',
@@ -370,19 +380,70 @@ function pushPeptideHits(sequence: string, target: PeptideTarget, strand: 'forwa
   }
 }
 
-export function getKnownSequenceHits(xdna: XdnaFile) {
+export function getBuiltinKnownSequenceTargets(): KnownSequenceTarget[] {
+  return [
+    ...builtin_dna_targets.map((target) => ({
+      name: target.name,
+      category: target.category,
+      kind: 'dna' as const,
+      description: target.description,
+      sequence: target.sequence,
+      feature_type: target.feature_type,
+      color: target.color,
+    })),
+    ...builtin_peptide_targets.map((target) => ({
+      name: target.name,
+      category: target.category,
+      kind: 'peptide' as const,
+      description: target.description,
+      sequence: target.peptide,
+      feature_type: target.feature_type,
+      color: target.color,
+    })),
+  ];
+}
+
+export function getKnownSequenceHits(xdna: XdnaFile, custom_targets: KnownSequenceTarget[] = []) {
   const sequence = normalizeSequence(xdna.sequence);
   const reverse_sequence = reverseComplement(sequence);
   const hits: KnownSequenceHit[] = [];
+  const targets = custom_targets;
 
-  for (const target of dna_targets) {
-    pushDnaHits(sequence, target, 'forward', hits);
-    pushDnaHits(reverse_sequence, target, 'reverse', hits);
-  }
+  for (const target of targets) {
+    if (target.kind === 'dna') {
+      const dna_target: DnaTarget = {
+        name: target.name,
+        category: target.category,
+        description: target.description,
+        sequence: normalizeSequence(target.sequence),
+        feature_type: target.feature_type,
+        color: target.color,
+      };
 
-  for (const target of peptide_targets) {
-    pushPeptideHits(sequence, target, 'forward', hits);
-    pushPeptideHits(reverse_sequence, target, 'reverse', hits);
+      if (!dna_target.sequence.length) {
+        continue;
+      }
+
+      pushDnaHits(sequence, dna_target, 'forward', hits);
+      pushDnaHits(reverse_sequence, dna_target, 'reverse', hits);
+      continue;
+    }
+
+    const peptide_target: PeptideTarget = {
+      name: target.name,
+      category: target.category,
+      description: target.description,
+      peptide: target.sequence.trim().toUpperCase(),
+      feature_type: target.feature_type,
+      color: target.color,
+    };
+
+    if (!peptide_target.peptide.length) {
+      continue;
+    }
+
+    pushPeptideHits(sequence, peptide_target, 'forward', hits);
+    pushPeptideHits(reverse_sequence, peptide_target, 'reverse', hits);
   }
 
   return hits.sort((left, right) => left.start - right.start || left.end - right.end || left.name.localeCompare(right.name));

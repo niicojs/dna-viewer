@@ -4,11 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '#/components/ui/button';
 import type { KnownSequenceCategory, KnownSequenceHit } from '#/lib/known-sequence-scan';
 import { getKnownSequenceHits } from '#/lib/known-sequence-scan';
+import type { ScanSettings } from '#/lib/scan-settings';
 import { cn } from '#/lib/utils';
 import type { XdnaFile } from '#/lib/xdna-parser';
 
 type Props = {
   xdna: XdnaFile;
+  settings: ScanSettings;
   onPreviewHit: (hit: KnownSequenceHit) => void;
   onAddHit: (hit: KnownSequenceHit) => void;
 };
@@ -31,7 +33,7 @@ function kindLabel(hit: KnownSequenceHit) {
   return hit.kind === 'dna' ? 'DNA motif' : `Peptide ${hit.frame}`;
 }
 
-export function KnownSequenceScan({ xdna, onPreviewHit, onAddHit }: Props) {
+export function KnownSequenceScan({ xdna, settings, onPreviewHit, onAddHit }: Props) {
   const [enabled_categories, set_enabled_categories] = useState<KnownSequenceCategory[]>(
     category_options.map((option) => option.value),
   );
@@ -58,7 +60,7 @@ export function KnownSequenceScan({ xdna, onPreviewHit, onAddHit }: Props) {
   }
 
   function runScan() {
-    set_scanned_hits(getKnownSequenceHits(xdna));
+    set_scanned_hits(getKnownSequenceHits(xdna, settings.known_sequences));
   }
 
   return (
@@ -71,8 +73,12 @@ export function KnownSequenceScan({ xdna, onPreviewHit, onAddHit }: Props) {
           </div>
 
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Detects built-in known motifs directly in the loaded sequence, including promoters, peptide tags,
+            Detects configured known motifs directly in the loaded sequence, including promoters, peptide tags,
             terminators and common restriction sites.
+          </p>
+
+          <p className="text-muted-foreground mt-2 text-xs">
+            Active settings: {settings.known_sequences.length} configured sequence{settings.known_sequences.length === 1 ? '' : 's'}.
           </p>
 
           <Button className="mt-4 w-full" onClick={runScan}>

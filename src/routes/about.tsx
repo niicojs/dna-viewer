@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Dna, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
+import { AppHeader } from '#/components/app-header';
 import { buttonVariants } from '#/components/ui/button';
 
 export const Route = createFileRoute('/about')({ component: About });
@@ -8,16 +9,14 @@ export const Route = createFileRoute('/about')({ component: About });
 function About() {
   return (
     <div className="app-shell">
-      <header className="app-titlebar">
-        <Dna size={16} className="text-primary shrink-0" />
-        <span className="text-foreground shrink-0 text-sm font-semibold">nico's dna viewer</span>
-        <div className="ml-auto">
+      <AppHeader
+        right_actions={
           <Link to="/" className={buttonVariants({ variant: 'ghost', size: 'sm' }) + ' gap-1.5 text-xs no-underline'}>
             <ArrowLeft size={13} />
             Back
           </Link>
-        </div>
-      </header>
+        }
+      />
       <div className="app-body">
         <main className="app-main">
           <div className="app-panel max-w-lg">

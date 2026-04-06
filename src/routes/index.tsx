@@ -20,11 +20,13 @@ import {
 import { useCallback, useRef, useState } from 'react';
 import type { ExternalSelection, Selection } from 'seqviz/dist/selectionContext';
 
+import { AppHeader } from '#/components/app-header';
 import { FeatureList } from '#/components/feature-list';
 import { KnownSequenceScan } from '#/components/known-sequence-scan';
 import { SeqVizViewer } from '#/components/seqviz-viewer';
 import { Button } from '#/components/ui/button';
 import type { KnownSequenceHit } from '#/lib/known-sequence-scan';
+import { loadScanSettings } from '#/lib/scan-settings';
 import { useTheme, type Theme } from '#/lib/use-theme';
 import { cn } from '#/lib/utils';
 import { readSequenceFile, serializeDNAFile, type XdnaFile, type Feature } from '#/lib/xdna-parser';
@@ -145,6 +147,7 @@ function App() {
   const [featureToEdit, setFeatureToEdit] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [search, setSearch] = useState('');
+  const [scan_settings] = useState(() => loadScanSettings());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { theme, setTheme } = useTheme();
 
@@ -352,14 +355,10 @@ function App() {
 
   return (
     <div className="app-shell">
-      {/* ── Title bar ── */}
-      <header className="app-titlebar">
-        <Dna size={16} className="text-primary shrink-0" />
-        <span className="text-foreground shrink-0 text-sm font-semibold">nico's dna viewer</span>
-
-        {xdna && <span className="text-muted-foreground ml-2 max-w-100 truncate text-xs">— {xdna.file.name}</span>}
-
-        <div className="ml-auto flex items-center gap-1">
+      <AppHeader
+        file_name={xdna?.file.name}
+        right_actions={
+          <>
           <Button variant="ghost" size="icon-sm" onClick={() => setTheme(nextTheme)} title={`Theme: ${theme}`}>
             <ThemeIcon size={14} />
           </Button>
@@ -379,8 +378,9 @@ function App() {
             Save XDNA
           </Button>
           <input ref={fileInputRef} type="file" accept=".xdna,.txt" className="hidden" onChange={onFileInput} />
-        </div>
-      </header>
+          </>
+        }
+      />
 
       {/* ── Body ── */}
       <div className="app-body">
@@ -679,6 +679,7 @@ function App() {
             {xdna && activeTab === 'scanner' && (
               <KnownSequenceScan
                 xdna={xdna}
+                settings={scan_settings}
                 onPreviewHit={handleKnownSequencePreview}
                 onAddHit={handleKnownSequenceAdd}
               />
