@@ -131,7 +131,7 @@ export type Overhang = {
 };
 
 export type XdnaFile = {
-  file: { size: number; format: 'XDNA' | 'TXT'; name: string };
+  file: { size: number; format: 'XDNA' | 'TXT' | 'FASTA'; name: string };
   header: {
     version: number;
     sequenceType: string;
@@ -160,6 +160,42 @@ export type XdnaFile = {
     trailingBytes: number;
   } | null;
 };
+
+function parseFastaText(text: string): { sequence: string; comment: string } {
+  const lines = text.split(/\r\n|\n|\r/);
+  const header_line = lines[0]?.trim();
+
+  if (!header_line?.startsWith('>')) {
+    fail('FASTA file must start with a header line beginning with ">"');
+  }
+
+  const comment = header_line.slice(1).trim();
+  const sequence_lines: string[] = [];
+
+  for (let index = 1; index < lines.length; index += 1) {
+    const trimmed_line = lines[index]?.trim() ?? '';
+
+    if (!trimmed_line) continue;
+
+    if (trimmed_line.startsWith('>')) {
+      fail('FASTA file contains multiple sequence records; only single-record FASTA is supported');
+    }
+
+    sequence_lines.push(trimmed_line);
+  }
+
+  const sequence = sequence_lines.join('').toUpperCase();
+
+  if (!sequence) {
+    fail('FASTA file does not contain a sequence');
+  }
+
+  if (!/^[ACGTRYSWKMBDHVNUX*.-]+$/i.test(sequence)) {
+    fail('FASTA file contains unsupported characters');
+  }
+
+  return { sequence, comment };
+}
 
 function parseFeature(view: DataView, offset: number, index: number): { feature: Feature; nextOffset: number } {
   const nameField = readPascalString(view, offset, `feature ${index} name`);
@@ -297,13 +333,17 @@ export function parseXdnaBuffer(buffer: ArrayBuffer, fileName = 'unknown.xdna'):
   };
 }
 export function parseDnaText(text: string, fileName = 'unknown.txt', fileSize = text.length): XdnaFile {
-  const sequence = text.replace(/\s+/g, '').toUpperCase();
+  const normalized_text = text.replace(/^\uFEFF/, '');
+  const is_fasta = normalized_text.startsWith('>');
+  const { sequence, comment } = is_fasta
+    ? parseFastaText(normalized_text)
+    : { sequence: normalized_text.replace(/\s+/g, '').toUpperCase(), comment: '' };
 
   if (!sequence) fail('DNA text file is empty');
-  if (!/^[ACGTRYSWKMBDHVNUX*.-]+$/i.test(sequence)) fail('DNA text file contains unsupported characters');
+  if (!is_fasta && !/^[ACGTRYSWKMBDHVNUX*.-]+$/i.test(sequence)) fail('DNA text file contains unsupported characters');
 
   return {
-    file: { size: fileSize, format: 'TXT', name: fileName },
+    file: { size: fileSize, format: is_fasta ? 'FASTA' : 'TXT', name: fileName },
     header: {
       version: 0,
       sequenceType: 'DNA',
@@ -312,17 +352,17 @@ export function parseDnaText(text: string, fileName = 'unknown.txt', fileSize = 
       rawTopology: 0,
       sequenceLength: sequence.length,
       negativeLength: 0,
-      commentLength: 0,
+      commentLength: comment.length,
       terminator: 0,
     },
     offsets: {
       header: { start: 0, end: 0 },
       sequence: { start: 0, end: sequence.length },
-      comment: { start: sequence.length, end: sequence.length },
+      comment: { start: sequence.length, end: sequence.length + comment.length },
       annotations: null,
     },
     sequence,
-    comment: '',
+    comment,
     annotations: null,
   };
 }

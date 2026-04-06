@@ -2,7 +2,8 @@
 
 ## Tooling
 
-- This repo uses `vite-plus` (`vp`) as the real toolchain, configured in `vite.config.ts`. Prefer `pnpm exec vp ...` over guessing `eslint`, `prettier`, or raw `vitest` commands.
+- This repo uses `vite-plus` (`vp`) as the real toolchain, configured in `vite.config.ts`.
+- Use `vp fmt` for formatting and `vp lint` for linting and type-aware analysis.
 - Use `pnpm` (`packageManager` is `pnpm@10.33.0`).
 - Useful verified commands:
   - `pnpm dev` starts the TanStack Start dev server on port `3000`.

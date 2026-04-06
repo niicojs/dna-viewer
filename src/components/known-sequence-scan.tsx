@@ -78,7 +78,8 @@ export function KnownSequenceScan({ xdna, settings, onPreviewHit, onAddHit }: Pr
           </p>
 
           <p className="text-muted-foreground mt-2 text-xs">
-            Active settings: {settings.known_sequences.length} configured sequence{settings.known_sequences.length === 1 ? '' : 's'}.
+            Active settings: {settings.known_sequences.length} configured sequence
+            {settings.known_sequences.length === 1 ? '' : 's'}.
           </p>
 
           <Button className="mt-4 w-full" onClick={runScan}>

@@ -1,10 +1,11 @@
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { HeadContent, Link, Scripts, createRootRoute } from '@tanstack/react-router';
-import { ArrowLeft, Compass, Dna } from 'lucide-react';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { ArrowLeft, Compass, Dna } from 'lucide-react';
 
 import { AppHeader } from '#/components/app-header';
 import { buttonVariants } from '#/components/ui/button';
+
 import appCss from '../styles.css?url';
 
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`;
@@ -60,7 +61,7 @@ function NotFoundPage() {
       />
       <div className="app-body">
         <main className="app-main">
-          <div className="app-panel flex min-h-[24rem] items-center justify-center">
+          <div className="app-panel flex min-h-96 items-center justify-center">
             <div className="max-w-md text-center">
               <div className="bg-accent mx-auto mb-5 flex size-16 items-center justify-center rounded-full">
                 <Compass size={28} className="text-primary" />

@@ -156,7 +156,10 @@ function SettingsPage() {
               <Upload size={13} />
               Load settings
             </Button>
-            <Link to="/" className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'gap-1.5 text-xs no-underline')}>
+            <Link
+              to="/"
+              className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'gap-1.5 text-xs no-underline')}
+            >
               <ArrowLeft size={13} />
               Back
             </Link>
@@ -183,8 +186,8 @@ function SettingsPage() {
             <section className="max-w-4xl space-y-2">
               <h1 className="text-xl font-semibold">Sequence scan settings</h1>
               <p className="text-muted-foreground text-sm">
-                Define the full known DNA and peptide reference list used by the Sequence Scan tab. Settings are stored locally and
-                can also be exported/imported.
+                Define the full known DNA and peptide reference list used by the Sequence Scan tab. Settings are stored
+                locally and can also be exported/imported.
               </p>
             </section>
 
@@ -192,23 +195,42 @@ function SettingsPage() {
               <div className="border-border bg-card space-y-4 rounded-lg border p-4">
                 <div>
                   <h2 className="text-sm font-semibold">{editing_index !== null ? 'Edit sequence' : 'Add sequence'}</h2>
-                  <p className="text-muted-foreground mt-1 text-sm">DNA entries scan raw nucleotides. Peptide entries scan translated reading frames.</p>
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    DNA entries scan raw nucleotides. Peptide entries scan translated reading frames.
+                  </p>
                 </div>
 
                 <FormField label="Name">
-                  <input value={draft.name} onChange={(e) => set_draft((current) => ({ ...current, name: e.target.value }))} className={input_class_name} placeholder="Example: Twin-Strep tag" />
+                  <input
+                    value={draft.name}
+                    onChange={(e) => set_draft((current) => ({ ...current, name: e.target.value }))}
+                    className={input_class_name}
+                    placeholder="Example: Twin-Strep tag"
+                  />
                 </FormField>
 
                 <div className="grid gap-3 sm:grid-cols-2">
                   <FormField label="Type">
-                    <select value={draft.kind} onChange={(e) => set_draft((current) => ({ ...current, kind: e.target.value as 'dna' | 'peptide' }))} className={input_class_name}>
+                    <select
+                      value={draft.kind}
+                      onChange={(e) =>
+                        set_draft((current) => ({ ...current, kind: e.target.value as 'dna' | 'peptide' }))
+                      }
+                      className={input_class_name}
+                    >
                       <option value="dna">DNA</option>
                       <option value="peptide">Peptide</option>
                     </select>
                   </FormField>
 
                   <FormField label="Category">
-                    <select value={draft.category} onChange={(e) => set_draft((current) => ({ ...current, category: e.target.value as KnownSequenceCategory }))} className={input_class_name}>
+                    <select
+                      value={draft.category}
+                      onChange={(e) =>
+                        set_draft((current) => ({ ...current, category: e.target.value as KnownSequenceCategory }))
+                      }
+                      className={input_class_name}
+                    >
                       {category_options.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -228,12 +250,22 @@ function SettingsPage() {
                 </FormField>
 
                 <FormField label="Description">
-                  <textarea value={draft.description} onChange={(e) => set_draft((current) => ({ ...current, description: e.target.value }))} className={cn(input_class_name, 'min-h-24 resize-y')} placeholder="Short description shown in scan results" />
+                  <textarea
+                    value={draft.description}
+                    onChange={(e) => set_draft((current) => ({ ...current, description: e.target.value }))}
+                    className={cn(input_class_name, 'min-h-24 resize-y')}
+                    placeholder="Short description shown in scan results"
+                  />
                 </FormField>
 
                 <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
                   <FormField label="Feature type">
-                    <input value={draft.feature_type} onChange={(e) => set_draft((current) => ({ ...current, feature_type: e.target.value }))} className={input_class_name} placeholder="misc_feature" />
+                    <input
+                      value={draft.feature_type}
+                      onChange={(e) => set_draft((current) => ({ ...current, feature_type: e.target.value }))}
+                      className={input_class_name}
+                      placeholder="misc_feature"
+                    />
                   </FormField>
 
                   <FormField label="Color">
@@ -271,7 +303,9 @@ function SettingsPage() {
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
                     <h2 className="text-sm font-semibold">Custom sequences</h2>
-                    <p className="text-muted-foreground mt-1 text-sm">This is the full sequence list used by the scanner once settings are saved.</p>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      This is the full sequence list used by the scanner once settings are saved.
+                    </p>
                   </div>
                   <span className="bg-muted text-muted-foreground rounded-full px-2.5 py-1 text-xs font-medium">
                     {settings.known_sequences.length} total
@@ -316,7 +350,12 @@ function SequenceCard({
   onDelete: () => void;
 }) {
   return (
-    <div className={cn('border-border bg-muted/20 rounded-lg border p-4', is_editing && 'border-primary ring-primary/20 ring-2')}>
+    <div
+      className={cn(
+        'border-border bg-muted/20 rounded-lg border p-4',
+        is_editing && 'border-primary ring-primary/20 ring-2',
+      )}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">

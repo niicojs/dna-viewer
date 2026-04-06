@@ -359,25 +359,25 @@ function App() {
         file_name={xdna?.file.name}
         right_actions={
           <>
-          <Button variant="ghost" size="icon-sm" onClick={() => setTheme(nextTheme)} title={`Theme: ${theme}`}>
-            <ThemeIcon size={14} />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1.5 text-xs">
-            <FolderOpen size={13} />
-            Open file
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSave}
-            className="gap-1.5 text-xs"
-            disabled={!xdna}
-            title="Save current state as XDNA"
-          >
-            <Save size={13} />
-            Save XDNA
-          </Button>
-          <input ref={fileInputRef} type="file" accept=".xdna,.txt" className="hidden" onChange={onFileInput} />
+            <Button variant="ghost" size="icon-sm" onClick={() => setTheme(nextTheme)} title={`Theme: ${theme}`}>
+              <ThemeIcon size={14} />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1.5 text-xs">
+              <FolderOpen size={13} />
+              Open file
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSave}
+              className="gap-1.5 text-xs"
+              disabled={!xdna}
+              title="Save current state as XDNA"
+            >
+              <Save size={13} />
+              Save XDNA
+            </Button>
+            <input ref={fileInputRef} type="file" accept=".xdna,.txt" className="hidden" onChange={onFileInput} />
           </>
         }
       />

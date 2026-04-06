@@ -1,4 +1,8 @@
-import { getBuiltinKnownSequenceTargets, type KnownSequenceCategory, type KnownSequenceTarget } from '#/lib/known-sequence-scan';
+import {
+  getBuiltinKnownSequenceTargets,
+  type KnownSequenceCategory,
+  type KnownSequenceTarget,
+} from '#/lib/known-sequence-scan';
 
 export type ScanSettings = {
   version: 1;

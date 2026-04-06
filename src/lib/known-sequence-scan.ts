@@ -281,7 +281,10 @@ const codon_table: Record<string, string> = {
 };
 
 function normalizeSequence(sequence: string) {
-  return sequence.toUpperCase().replace(/U/g, 'T').replace(/[^ACGT]/g, 'N');
+  return sequence
+    .toUpperCase()
+    .replace(/U/g, 'T')
+    .replace(/[^ACGT]/g, 'N');
 }
 
 function reverseComplement(sequence: string) {
@@ -343,7 +346,12 @@ function pushDnaHits(sequence: string, target: DnaTarget, strand: 'forward' | 'r
   }
 }
 
-function pushPeptideHits(sequence: string, target: PeptideTarget, strand: 'forward' | 'reverse', hits: KnownSequenceHit[]) {
+function pushPeptideHits(
+  sequence: string,
+  target: PeptideTarget,
+  strand: 'forward' | 'reverse',
+  hits: KnownSequenceHit[],
+) {
   for (let frame_offset = 0; frame_offset < 3; frame_offset += 1) {
     const translated = translateFrame(sequence, frame_offset);
     let search_index = 0;
@@ -446,5 +454,7 @@ export function getKnownSequenceHits(xdna: XdnaFile, custom_targets: KnownSequen
     pushPeptideHits(reverse_sequence, peptide_target, 'reverse', hits);
   }
 
-  return hits.sort((left, right) => left.start - right.start || left.end - right.end || left.name.localeCompare(right.name));
+  return hits.sort(
+    (left, right) => left.start - right.start || left.end - right.end || left.name.localeCompare(right.name),
+  );
 }
