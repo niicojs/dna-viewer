@@ -25,6 +25,7 @@ import { FeatureList } from '#/components/feature-list';
 import { KnownSequenceScan } from '#/components/known-sequence-scan';
 import { SeqVizViewer } from '#/components/seqviz-viewer';
 import { Button } from '#/components/ui/button';
+import { FILE_ACCEPT } from '#/lib/const';
 import type { KnownSequenceHit } from '#/lib/known-sequence-scan';
 import { loadScanSettings } from '#/lib/scan-settings';
 import { useTheme, type Theme } from '#/lib/use-theme';
@@ -377,7 +378,7 @@ function App() {
               <Save size={13} />
               Save XDNA
             </Button>
-            <input ref={fileInputRef} type="file" accept=".xdna,.txt" className="hidden" onChange={onFileInput} />
+            <input ref={fileInputRef} type="file" accept={FILE_ACCEPT} className="hidden" onChange={onFileInput} />
           </>
         }
       />

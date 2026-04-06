@@ -397,16 +397,10 @@ export function readXdnaFile(file: File): Promise<XdnaFile> {
 export async function readSequenceFile(file: File): Promise<XdnaFile> {
   const name = file.name.toLowerCase();
 
-  if (name.endsWith('.xdna')) {
-    return readXdnaFile(file);
-  }
+  if (name.endsWith('.xdna')) return readXdnaFile(file);
 
-  if (name.endsWith('.txt')) {
-    const text = await file.text();
-    return parseDnaText(text, file.name, file.size);
-  }
-
-  throw new Error(`Unsupported file type: "${file.name}"`);
+  const text = await file.text();
+  return parseDnaText(text, file.name, file.size);
 }
 
 function normalizeOverhangLength(overhang: Overhang): number {
