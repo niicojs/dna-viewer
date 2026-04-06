@@ -24,7 +24,7 @@ import { Button } from '#/components/ui/button';
 import { useTheme, type Theme } from '#/lib/use-theme';
 import { cn } from '#/lib/utils';
 import type { Feature } from '#/lib/xdna-parser';
-import { readXdnaFile } from '#/lib/xdna-parser';
+import { readSequenceFile } from '#/lib/xdna-parser';
 import type { XdnaFile } from '#/lib/xdna-parser';
 
 export const Route = createFileRoute('/')({ component: App });
@@ -94,14 +94,14 @@ function App() {
   const { theme, setTheme } = useTheme();
 
   const handleFile = useCallback(async (file: File) => {
-    if (!file.name.toLowerCase().endsWith('.xdna')) {
-      setError(`Not an XDNA file: "${file.name}"`);
+    if (!/\.(xdna|txt)$/i.test(file.name)) {
+      setError(`Unsupported file type: "${file.name}"`);
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const parsed = await readXdnaFile(file);
+      const parsed = await readSequenceFile(file);
       setXdna(parsed);
       setSelectedFeature(undefined);
       setFeatureToEdit(null);
@@ -231,7 +231,7 @@ function App() {
             <FolderOpen size={13} />
             Open file
           </Button>
-          <input ref={fileInputRef} type="file" accept=".xdna" className="hidden" onChange={onFileInput} />
+          <input ref={fileInputRef} type="file" accept=".xdna,.txt" className="hidden" onChange={onFileInput} />
         </div>
       </header>
 
@@ -377,9 +377,10 @@ function App() {
                   <Dna size={36} className="text-primary" />
                 </div>
                 <div className="space-y-1 text-center">
-                  <p className="text-foreground font-semibold">Open an XDNA file</p>
+                  <p className="text-foreground font-semibold">Open an XDNA or TXT file</p>
                   <p className="text-muted-foreground text-sm">
-                    Drag & drop a <code className="text-xs">.xdna</code> file here, or use the button above
+                    Drag & drop a <code className="text-xs">.xdna</code> or <code className="text-xs">.txt</code>{' '}
+                    file here, or use the button above
                   </p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-2">

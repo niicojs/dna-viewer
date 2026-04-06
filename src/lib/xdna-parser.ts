@@ -100,7 +100,7 @@ export type Overhang = {
 };
 
 export type XdnaFile = {
-  file: { size: number; format: 'XDNA'; name: string };
+  file: { size: number; format: 'XDNA' | 'TXT'; name: string };
   header: {
     version: number;
     sequenceType: string;
@@ -266,6 +266,37 @@ export function parseXdnaBuffer(buffer: ArrayBuffer, fileName = 'unknown.xdna'):
   };
 }
 
+export function parseDnaText(text: string, fileName = 'unknown.txt', fileSize = text.length): XdnaFile {
+  const sequence = text.replace(/\s+/g, '').toUpperCase();
+
+  if (!sequence) fail('DNA text file is empty');
+  if (!/^[ACGTRYSWKMBDHVNUX*.-]+$/i.test(sequence)) fail('DNA text file contains unsupported characters');
+
+  return {
+    file: { size: fileSize, format: 'TXT', name: fileName },
+    header: {
+      version: 0,
+      sequenceType: 'DNA',
+      rawSequenceType: 1,
+      topology: 'linear',
+      rawTopology: 0,
+      sequenceLength: sequence.length,
+      negativeLength: 0,
+      commentLength: 0,
+      terminator: 0,
+    },
+    offsets: {
+      header: { start: 0, end: 0 },
+      sequence: { start: 0, end: sequence.length },
+      comment: { start: sequence.length, end: sequence.length },
+      annotations: null,
+    },
+    sequence,
+    comment: '',
+    annotations: null,
+  };
+}
+
 /** Parse the color string "R,G,B," → CSS rgb() */
 export function featureColorToCss(color: string): string {
   const parts = color
@@ -291,4 +322,19 @@ export function readXdnaFile(file: File): Promise<XdnaFile> {
     reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsArrayBuffer(file);
   });
+}
+
+export async function readSequenceFile(file: File): Promise<XdnaFile> {
+  const name = file.name.toLowerCase();
+
+  if (name.endsWith('.xdna')) {
+    return readXdnaFile(file);
+  }
+
+  if (name.endsWith('.txt')) {
+    const text = await file.text();
+    return parseDnaText(text, file.name, file.size);
+  }
+
+  throw new Error(`Unsupported file type: "${file.name}"`);
 }

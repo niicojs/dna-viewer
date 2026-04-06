@@ -3,7 +3,6 @@
  *
  * Key mapping notes:
  * - XDNA features use 1-based inclusive [start, end].
- * - SeqViz annotations use 0-based, start inclusive / end exclusive → subtract 1 from start, keep end as-is.
  * - XDNA strand: 'forward' → direction 1, 'reverse' → direction -1.
  * - XDNA color: "R,G,B," string → "rgb(R,G,B)".
  */
@@ -47,7 +46,7 @@ export function xdnaToSeqViz(xdna: XdnaFile): SeqVizInput {
     });
 
   const topology = xdna.header.topology === 'circular' ? 'circular' : 'linear';
-  const name = xdna.file.name.replace(/\.xdna$/i, '');
+  const name = xdna.file.name.replace(/\.(xdna|txt)$/i, '');
 
   return { name, seq: xdna.sequence, annotations, topology };
 }
