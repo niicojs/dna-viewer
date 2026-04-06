@@ -15,11 +15,12 @@ import {
   X,
 } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
-import type { Selection } from 'seqviz/dist/selectionContext';
+import type { ExternalSelection, Selection } from 'seqviz/dist/selectionContext';
 
 import { FeatureList } from '#/components/feature-list';
 import { SeqVizViewer } from '#/components/seqviz-viewer';
 import { Button } from '#/components/ui/button';
+import { useTheme, type Theme } from '#/lib/use-theme';
 import { cn } from '#/lib/utils';
 import { readXdnaFile } from '#/lib/xdna-parser';
 import type { XdnaFile } from '#/lib/xdna-parser';
@@ -28,31 +29,6 @@ export const Route = createFileRoute('/')({ component: App });
 
 type ViewerMode = 'circular' | 'linear' | 'both';
 type Tab = 'viewer' | 'info';
-type Theme = 'light' | 'dark' | 'auto';
-
-function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === 'undefined') return 'auto';
-    return (localStorage.getItem('theme') as Theme) ?? 'auto';
-  });
-
-  const setTheme = (t: Theme) => {
-    setThemeState(t);
-    localStorage.setItem('theme', t);
-    const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    if (t === 'auto') {
-      root.removeAttribute('data-theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.add(prefersDark ? 'dark' : 'light');
-    } else {
-      root.classList.add(t);
-      root.setAttribute('data-theme', t);
-    }
-  };
-
-  return { theme, setTheme };
-}
 
 function App() {
   const [xdna, setXdna] = useState<XdnaFile | null>(null);
@@ -60,7 +36,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('viewer');
   const [viewerMode, setViewerMode] = useState<ViewerMode>('circular');
-  const [selectedFeatureName, setSelectedFeatureName] = useState<string | null>(null);
+  const [selectedFeature, setSelectedFeature] = useState<Selection | undefined>(undefined);
   const [dragOver, setDragOver] = useState(false);
   const [search, setSearch] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,7 +52,7 @@ function App() {
     try {
       const parsed = await readXdnaFile(file);
       setXdna(parsed);
-      setSelectedFeatureName(null);
+      setSelectedFeature(undefined);
       setSearch('');
       setActiveTab('viewer');
     } catch (err) {
@@ -88,7 +64,7 @@ function App() {
 
   const onFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) handleFile(file);
+    if (file) void handleFile(file);
     e.target.value = '';
   };
 
@@ -96,30 +72,39 @@ function App() {
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
+    if (file) void handleFile(file);
   };
-
-  // Map seqviz selection back to a feature name for the sidebar
-  const handleSeqVizSelection = useCallback((sel: Selection) => {
-    if (sel.type === 'ANNOTATION' && sel.name) {
-      setSelectedFeatureName(sel.name);
-    } else if (!sel.name) {
-      setSelectedFeatureName(null);
-    }
-  }, []);
 
   const features = xdna?.annotations?.features ?? [];
 
   // Find selected feature index by name for the sidebar
-  const selectedFeatureIndex = selectedFeatureName
-    ? (features.find((f) => f.name === selectedFeatureName)?.index ?? null)
-    : null;
+  // const selectedFeatureIndex = selectedFeature
+  //   ? (features.find((f) => f.name === selectedFeature.name && f.start === selectedFeature.start)?.index ?? null)
+  //   : null;
+
+  let selectedFeatureIndex: number | null = null;
+  if (selectedFeature) {
+    selectedFeatureIndex =
+      features.find((f) => f.name === selectedFeature.name && f.start === selectedFeature.start)?.index ?? null;
+    console.log(selectedFeature);
+    console.log(features);
+    console.log(selectedFeatureIndex);
+  }
 
   // Sidebar click → highlight by name
   const handleSidebarSelect = useCallback(
     (index: number | null) => {
       const f = features.find((feat) => feat.index === index);
-      setSelectedFeatureName(f?.name ?? null);
+      if (!f) setSelectedFeature(undefined);
+      else {
+        setSelectedFeature({
+          start: f.start,
+          end: f.end,
+          name: f.name,
+          type: f.type as any,
+          clockwise: f.flags.strand !== 'reverse',
+        });
+      }
     },
     [features],
   );
@@ -338,7 +323,13 @@ function App() {
                 onDragLeave={() => setDragOver(false)}
                 onDrop={onDrop}
               >
-                <SeqVizViewer xdna={xdna} viewer={viewerMode} onSelection={handleSeqVizSelection} search={search} />
+                <SeqVizViewer
+                  xdna={xdna}
+                  viewer={viewerMode}
+                  selection={selectedFeature as ExternalSelection}
+                  onSelection={(selection) => setSelectedFeature(selection)}
+                  search={search}
+                />
               </div>
             )}
 

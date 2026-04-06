@@ -33,11 +33,9 @@ export function xdnaToSeqViz(xdna: XdnaFile): SeqVizInput {
   const annotations: AnnotationProp[] = (xdna.annotations?.features ?? [])
     .filter((f) => f.flags.visible)
     .map((f) => {
-      // XDNA: 1-based inclusive [start, end]
-      // SeqViz: 0-based, start inclusive, end exclusive
       // Wrap-around features (end < start) are kept as-is — seqviz handles them natively
-      const start = Math.min(f.start, f.end) - 1;
-      const end = Math.max(f.start, f.end); // end is already exclusive after +0 from 1-based
+      const start = Math.min(f.start, f.end);
+      const end = Math.max(f.start, f.end);
 
       return {
         name: f.name || '(unnamed)',

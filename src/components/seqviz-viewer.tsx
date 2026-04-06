@@ -9,7 +9,7 @@
  */
 
 import { SeqViz } from 'seqviz';
-import type { Selection } from 'seqviz/dist/selectionContext';
+import type { ExternalSelection, Selection } from 'seqviz/dist/selectionContext';
 
 import type { XdnaFile } from '#/lib/xdna-parser';
 import { xdnaToSeqViz } from '#/lib/xdna-to-seqviz';
@@ -20,13 +20,14 @@ type Props = {
   xdna: XdnaFile;
   viewer?: ViewerMode;
   /** 0-based feature index from seqviz selection, or null */
+  selection?: ExternalSelection;
   onSelection?: (selection: Selection) => void;
   /** Externally highlight a feature by its annotation name */
   highlightName?: string | null;
   search?: string;
 };
 
-export function SeqVizViewer({ xdna, viewer = 'circular', onSelection, search }: Props) {
+export function SeqVizViewer({ xdna, viewer = 'circular', selection, onSelection, search }: Props) {
   const { name, seq, annotations } = xdnaToSeqViz(xdna);
 
   // Build search prop only when non-empty
@@ -43,10 +44,11 @@ export function SeqVizViewer({ xdna, viewer = 'circular', onSelection, search }:
         // For linear topology we still use circular viewer mode as seqviz always supports it
         showComplement={viewer !== 'circular'}
         showIndex
-        rotateOnScroll={false}
+        rotateOnScroll={true}
         disableExternalFonts
         primers={[]}
         search={searchProp}
+        selection={selection}
         onSelection={onSelection}
         style={{ height: '100%', width: '100%' }}
         zoom={{ linear: 50 }}
