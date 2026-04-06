@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="58%">
+      <stop offset="0%"  stop-color="#163040"/>
+      <stop offset="100%" stop-color="#090f18"/>
+    </radialGradient>
+    <radialGradient id="center-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#1e4a5a" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#090f18" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="teal-blur" x="-60%" y="-5%" width="220%" height="110%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="green-blur" x="-60%" y="-5%" width="220%" height="110%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="teal-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#7de8e0"/>
+      <stop offset="50%"  stop-color="#3dd6c8"/>
+      <stop offset="100%" stop-color="#28a89e"/>
+    </linearGradient>
+    <linearGradient id="green-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#8ef5a8"/>
+      <stop offset="50%"  stop-color="#5edc8a"/>
+      <stop offset="100%" stop-color="#3ab86a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="112" fill="url(#center-glow)"/>
+
+  <!-- Left strand (teal) -->
+  <path d="M186 36
+           C150 80, 210 124, 186 168
+           C162 212, 222 256, 186 300
+           C150 344, 210 388, 186 432
+           C170 462, 186 478, 186 478"
+        stroke="url(#teal-grad)" stroke-width="20" stroke-linecap="round" fill="none"
+        filter="url(#teal-blur)"/>
+
+  <!-- Right strand (green) -->
+  <path d="M326 36
+           C362 80, 302 124, 326 168
+           C350 212, 290 256, 326 300
+           C362 344, 302 388, 326 432
+           C342 462, 326 478, 326 478"
+        stroke="url(#green-grad)" stroke-width="20" stroke-linecap="round" fill="none"
+        filter="url(#green-blur)"/>
+
+  <!-- Base pairs -->
+  <!-- pair 1 -->
+  <line x1="186" y1="72"  x2="326" y2="72"  stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity="0.18"/>
+  <!-- pair 2 -->
+  <line x1="186" y1="120" x2="326" y2="120" stroke="#3dd6c8" stroke-width="13" stroke-linecap="round" opacity="0.72"/>
+  <!-- pair 3 -->
+  <line x1="186" y1="168" x2="326" y2="168" stroke="#5edc8a" stroke-width="12" stroke-linecap="round" opacity="0.58"/>
+  <!-- pair 4 -->
+  <line x1="186" y1="214" x2="326" y2="214" stroke="#ffffff" stroke-width="13" stroke-linecap="round" opacity="0.28"/>
+  <!-- pair 5 — centre, plus visible -->
+  <line x1="186" y1="258" x2="326" y2="258" stroke="#3dd6c8" stroke-width="14" stroke-linecap="round" opacity="0.85"/>
+  <!-- pair 6 -->
+  <line x1="186" y1="302" x2="326" y2="302" stroke="#5edc8a" stroke-width="13" stroke-linecap="round" opacity="0.62"/>
+  <!-- pair 7 -->
+  <line x1="186" y1="348" x2="326" y2="348" stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity="0.28"/>
+  <!-- pair 8 -->
+  <line x1="186" y1="394" x2="326" y2="394" stroke="#3dd6c8" stroke-width="13" stroke-linecap="round" opacity="0.72"/>
+  <!-- pair 9 -->
+  <line x1="186" y1="442" x2="326" y2="442" stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity="0.18"/>
+
+  <!-- End caps — top -->
+  <circle cx="186" cy="36"  r="13" fill="#3dd6c8" opacity="0.95"/>
+  <circle cx="326" cy="36"  r="13" fill="#5edc8a" opacity="0.95"/>
+  <!-- End caps — bottom -->
+  <circle cx="186" cy="478" r="13" fill="#3dd6c8" opacity="0.95"/>
+  <circle cx="326" cy="478" r="13" fill="#5edc8a" opacity="0.95"/>
+</svg>

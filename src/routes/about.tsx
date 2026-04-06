@@ -1,4 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { Dna, ArrowLeft } from 'lucide-react';
+import { buttonVariants } from '#/components/ui/button';
 
 export const Route = createFileRoute('/about')({
   component: About,
@@ -6,17 +8,31 @@ export const Route = createFileRoute('/about')({
 
 function About() {
   return (
-    <main className="page-wrap px-4 py-12">
-      <section className="island-shell rounded-2xl p-6 sm:p-8">
-        <p className="island-kicker mb-2">About</p>
-        <h1 className="display-title mb-3 text-4xl font-bold text-[var(--sea-ink)] sm:text-5xl">
-          A small starter with room to grow.
-        </h1>
-        <p className="m-0 max-w-3xl text-base leading-8 text-[var(--sea-ink-soft)]">
-          TanStack Start gives you type-safe routing, server functions, and modern SSR defaults. Use this as a clean
-          foundation, then layer in your own routes, styling, and add-ons.
-        </p>
-      </section>
-    </main>
+    <div className="app-shell">
+      <header className="app-titlebar">
+        <Dna size={16} className="text-primary flex-shrink-0" />
+        <span className="text-sm font-semibold text-foreground flex-shrink-0">XDNA Viewer</span>
+        <div className="ml-auto">
+          <Link to="/" className={buttonVariants({ variant: 'ghost', size: 'sm' }) + ' gap-1.5 text-xs no-underline'}>
+            <ArrowLeft size={13} />
+            Back
+          </Link>
+        </div>
+      </header>
+      <div className="app-body">
+        <main className="app-main">
+          <div className="app-panel max-w-lg">
+            <h1 className="text-xl font-semibold mb-1">XDNA Viewer</h1>
+            <p className="text-sm text-muted-foreground mb-4">
+              A local tool for opening, parsing, and inspecting XDNA binary sequence files.
+              All processing happens entirely in the browser — no data is uploaded anywhere.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Supports: sequences, annotations, features, overhangs, and topology metadata.
+            </p>
+          </div>
+        </main>
+      </div>
+    </div>
   );
 }

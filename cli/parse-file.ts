@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
-import { parseXdna } from '../src/lib/xdna.ts';
+import { parseXdna } from '../src/lib/xdna-file.ts';
 
 const inputPath = resolve(process.cwd(), process.argv[2] ?? 'data/example.xdna');
 const data = readFileSync(inputPath);
