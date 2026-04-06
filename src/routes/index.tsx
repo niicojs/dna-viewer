@@ -17,8 +17,8 @@ import {
 import { useCallback, useRef, useState } from 'react';
 import type { Selection } from 'seqviz/dist/selectionContext';
 
-import { SeqVizViewer } from '#/components/seqviz-viewer';
 import { FeatureList } from '#/components/feature-list';
+import { SeqVizViewer } from '#/components/seqviz-viewer';
 import { Button } from '#/components/ui/button';
 import { cn } from '#/lib/utils';
 import { readXdnaFile } from '#/lib/xdna-parser';
@@ -134,22 +134,13 @@ function App() {
         <Dna size={16} className="text-primary shrink-0" />
         <span className="text-foreground shrink-0 text-sm font-semibold">XDNA Viewer</span>
 
-        {xdna && (
-          <span className="text-muted-foreground ml-2 max-w-50 truncate text-xs">
-            — {xdna.file.name}
-          </span>
-        )}
+        {xdna && <span className="text-muted-foreground ml-2 max-w-50 truncate text-xs">— {xdna.file.name}</span>}
 
         <div className="ml-auto flex items-center gap-1">
           <Button variant="ghost" size="icon-sm" onClick={() => setTheme(nextTheme)} title={`Theme: ${theme}`}>
             <ThemeIcon size={14} />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-            className="gap-1.5 text-xs"
-          >
+          <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1.5 text-xs">
             <FolderOpen size={13} />
             Open file
           </Button>
@@ -185,9 +176,7 @@ function App() {
               </div>
               <div className="flex justify-between">
                 <span>Length</span>
-                <span className="text-foreground font-medium">
-                  {xdna.header.sequenceLength.toLocaleString()} bp
-                </span>
+                <span className="text-foreground font-medium">{xdna.header.sequenceLength.toLocaleString()} bp</span>
               </div>
               <div className="flex justify-between">
                 <span>Topology</span>
@@ -224,10 +213,7 @@ function App() {
                 <Dna size={12} />
                 Viewer
               </button>
-              <button
-                className={cn('app-tab', activeTab === 'info' && 'active')}
-                onClick={() => setActiveTab('info')}
-              >
+              <button className={cn('app-tab', activeTab === 'info' && 'active')} onClick={() => setActiveTab('info')}>
                 <Info size={12} />
                 Info
               </button>
@@ -238,8 +224,8 @@ function App() {
                     {(
                       [
                         { mode: 'circular', icon: <Circle size={10} />, label: 'Circular' },
-                        { mode: 'linear',   icon: <Minus size={10} />,  label: 'Linear'   },
-                        { mode: 'both',     icon: <LayoutTemplate size={10} />, label: 'Both' },
+                        { mode: 'linear', icon: <Minus size={10} />, label: 'Linear' },
+                        { mode: 'both', icon: <LayoutTemplate size={10} />, label: 'Both' },
                       ] as const
                     ).map(({ mode, icon, label }) => (
                       <button
@@ -265,7 +251,7 @@ function App() {
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       placeholder="Search sequence…"
-                      className="h-full w-28 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+                      className="placeholder:text-muted-foreground h-full w-28 bg-transparent text-xs outline-none"
                     />
                     {search && (
                       <button onClick={() => setSearch('')} className="text-muted-foreground hover:text-foreground">
@@ -279,10 +265,7 @@ function App() {
           )}
 
           {/* Panel content */}
-          <div
-            className="app-panel"
-            style={{ padding: activeTab === 'viewer' && xdna ? 0 : undefined }}
-          >
+          <div className="app-panel" style={{ padding: activeTab === 'viewer' && xdna ? 0 : undefined }}>
             {/* Welcome / drop-zone */}
             {!xdna && !loading && !error && (
               <div
@@ -290,7 +273,10 @@ function App() {
                   'drop-zone flex flex-col items-center justify-center gap-4 h-full min-h-100',
                   dragOver && 'drag-over',
                 )}
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={onDrop}
               >
@@ -331,7 +317,10 @@ function App() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => { setError(null); fileInputRef.current?.click(); }}
+                  onClick={() => {
+                    setError(null);
+                    fileInputRef.current?.click();
+                  }}
                 >
                   Try another file
                 </Button>
@@ -341,17 +330,15 @@ function App() {
             {/* SeqViz viewer */}
             {xdna && activeTab === 'viewer' && (
               <div
-                className="w-full h-full"
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                className="h-full w-full"
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={onDrop}
               >
-                <SeqVizViewer
-                  xdna={xdna}
-                  viewer={viewerMode}
-                  onSelection={handleSeqVizSelection}
-                  search={search}
-                />
+                <SeqVizViewer xdna={xdna} viewer={viewerMode} onSelection={handleSeqVizSelection} search={search} />
               </div>
             )}
 
@@ -360,57 +347,75 @@ function App() {
               <div className="max-w-lg space-y-4">
                 <section>
                   <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">File</h3>
-                  <InfoGrid rows={[
-                    ['Name', xdna.file.name],
-                    ['Format', xdna.file.format],
-                    ['Size', `${xdna.file.size.toLocaleString()} bytes`],
-                  ]} />
+                  <InfoGrid
+                    rows={[
+                      ['Name', xdna.file.name],
+                      ['Format', xdna.file.format],
+                      ['Size', `${xdna.file.size.toLocaleString()} bytes`],
+                    ]}
+                  />
                 </section>
 
                 <section>
                   <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">Header</h3>
-                  <InfoGrid rows={[
-                    ['Version', String(xdna.header.version)],
-                    ['Sequence type', xdna.header.sequenceType],
-                    ['Topology', xdna.header.topology],
-                    ['Sequence length', `${xdna.header.sequenceLength.toLocaleString()} bp`],
-                    ['Comment length', `${xdna.header.commentLength} bytes`],
-                  ]} />
+                  <InfoGrid
+                    rows={[
+                      ['Version', String(xdna.header.version)],
+                      ['Sequence type', xdna.header.sequenceType],
+                      ['Topology', xdna.header.topology],
+                      ['Sequence length', `${xdna.header.sequenceLength.toLocaleString()} bp`],
+                      ['Comment length', `${xdna.header.commentLength} bytes`],
+                    ]}
+                  />
                 </section>
 
                 {xdna.comment && (
                   <section>
-                    <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">Comment</h3>
-                    <p className="text-foreground bg-muted/40 rounded-md p-3 text-sm leading-relaxed">
-                      {xdna.comment}
-                    </p>
+                    <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
+                      Comment
+                    </h3>
+                    <p className="text-foreground bg-muted/40 rounded-md p-3 text-sm leading-relaxed">{xdna.comment}</p>
                   </section>
                 )}
 
                 <section>
-                  <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">Byte offsets</h3>
-                  <InfoGrid rows={[
-                    ['Header', `0 – ${xdna.offsets.header.end}`],
-                    ['Sequence', `${xdna.offsets.sequence.start} – ${xdna.offsets.sequence.end}`],
-                    ['Comment', `${xdna.offsets.comment.start} – ${xdna.offsets.comment.end}`],
-                    xdna.offsets.annotations
-                      ? ['Annotations', `${xdna.offsets.annotations.start} – ${xdna.offsets.annotations.end}`]
-                      : ['Annotations', 'none'],
-                  ]} />
+                  <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
+                    Byte offsets
+                  </h3>
+                  <InfoGrid
+                    rows={[
+                      ['Header', `0 – ${xdna.offsets.header.end}`],
+                      ['Sequence', `${xdna.offsets.sequence.start} – ${xdna.offsets.sequence.end}`],
+                      ['Comment', `${xdna.offsets.comment.start} – ${xdna.offsets.comment.end}`],
+                      xdna.offsets.annotations
+                        ? ['Annotations', `${xdna.offsets.annotations.start} – ${xdna.offsets.annotations.end}`]
+                        : ['Annotations', 'none'],
+                    ]}
+                  />
                 </section>
 
                 {xdna.annotations && (
                   <section>
-                    <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">Annotations</h3>
-                    <InfoGrid rows={[
-                      ['Feature count', String(xdna.annotations.featureCount)],
-                      ['Right overhang', xdna.annotations.rightOverhang.type === 'none'
-                        ? 'none'
-                        : `${xdna.annotations.rightOverhang.type} — ${xdna.annotations.rightOverhang.sequence}`],
-                      ['Left overhang', xdna.annotations.leftOverhang.type === 'none'
-                        ? 'none'
-                        : `${xdna.annotations.leftOverhang.type} — ${xdna.annotations.leftOverhang.sequence}`],
-                    ]} />
+                    <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
+                      Annotations
+                    </h3>
+                    <InfoGrid
+                      rows={[
+                        ['Feature count', String(xdna.annotations.featureCount)],
+                        [
+                          'Right overhang',
+                          xdna.annotations.rightOverhang.type === 'none'
+                            ? 'none'
+                            : `${xdna.annotations.rightOverhang.type} — ${xdna.annotations.rightOverhang.sequence}`,
+                        ],
+                        [
+                          'Left overhang',
+                          xdna.annotations.leftOverhang.type === 'none'
+                            ? 'none'
+                            : `${xdna.annotations.leftOverhang.type} — ${xdna.annotations.leftOverhang.sequence}`,
+                        ],
+                      ]}
+                    />
                   </section>
                 )}
               </div>
@@ -427,9 +432,7 @@ function InfoGrid({ rows }: { rows: [string, string][] }) {
     <div className="border-border divide-border divide-y overflow-hidden rounded-md border text-sm">
       {rows.map(([label, value]) => (
         <div key={label} className="flex">
-          <span className="bg-muted/40 text-muted-foreground w-36 shrink-0 px-3 py-2 text-xs font-medium">
-            {label}
-          </span>
+          <span className="bg-muted/40 text-muted-foreground w-36 shrink-0 px-3 py-2 text-xs font-medium">{label}</span>
           <span className="text-foreground flex-1 px-3 py-2 font-mono text-xs break-all">{value}</span>
         </div>
       ))}

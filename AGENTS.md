@@ -1,6 +1,7 @@
 # AGENTS.md
 
 ## Tooling
+
 - This repo uses `vite-plus` (`vp`) as the real toolchain, configured in `vite.config.ts`. Prefer `pnpm exec vp ...` over guessing `eslint`, `prettier`, or raw `vitest` commands.
 - Use `pnpm` (`packageManager` is `pnpm@10.33.0`).
 - Useful verified commands:
@@ -12,6 +13,7 @@
   - `vp check --no-fmt <path>` is the focused lint/typecheck shortcut when you do not need a format pass.
 
 ## Codebase Map
+
 - This is a single-package TanStack Start app, not a monorepo.
 - Main app flow:
   - `src/routes/__root.tsx`: document shell, global CSS include, theme boot script, devtools.
@@ -26,8 +28,10 @@
 - Import aliases `#/*` and `@/*` both resolve to `src/*`.
 
 ## Generated And Fragile Files
+
 - Do not edit `src/routeTree.gen.ts`; TanStack Router regenerates it and the file header explicitly marks it generated.
 - `.tanstack/` and `.output/` are generated directories.
 
 ## Naming
+
 - Use `snake_case` for both local variable names and filenames.

@@ -10,6 +10,7 @@
 
 import { SeqViz } from 'seqviz';
 import type { Selection } from 'seqviz/dist/selectionContext';
+
 import type { XdnaFile } from '#/lib/xdna-parser';
 import { xdnaToSeqViz } from '#/lib/xdna-to-seqviz';
 

@@ -54,9 +54,7 @@
         "index": 1,
         "name": "FwseqMA",
         "description": "note=\"direct strand translation\"translation=\"LQFYLQX\"",
-        "descriptionLines": [
-          "note=\"direct strand translation\"translation=\"LQFYLQX\""
-        ],
+        "descriptionLines": ["note=\"direct strand translation\"translation=\"LQFYLQX\""],
         "type": "misc_feature",
         "start": 1943,
         "end": 1962,

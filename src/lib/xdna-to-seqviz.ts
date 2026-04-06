@@ -9,6 +9,7 @@
  */
 
 import type { AnnotationProp } from 'seqviz/dist/elements';
+
 import type { XdnaFile } from '#/lib/xdna-parser';
 
 export type SeqVizInput = {
@@ -20,7 +21,10 @@ export type SeqVizInput = {
 
 /** Convert "R,G,B," → "rgb(R,G,B)" */
 function xdnaColorToRgb(color: string): string {
-  const parts = color.split(',').map((s) => s.trim()).filter(Boolean);
+  const parts = color
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   if (parts.length >= 3) return `rgb(${parts[0]}, ${parts[1]}, ${parts[2]})`;
   return '#999999';
 }

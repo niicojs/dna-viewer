@@ -268,7 +268,10 @@ export function parseXdnaBuffer(buffer: ArrayBuffer, fileName = 'unknown.xdna'):
 
 /** Parse the color string "R,G,B," → CSS rgb() */
 export function featureColorToCss(color: string): string {
-  const parts = color.split(',').map((s) => s.trim()).filter(Boolean);
+  const parts = color
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   if (parts.length >= 3) return `rgb(${parts[0]},${parts[1]},${parts[2]})`;
   return 'rgb(150,150,150)';
 }
