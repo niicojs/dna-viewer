@@ -4,6 +4,7 @@ import {
   Save,
   Dna,
   List,
+  Pencil,
   Info,
   ScanSearch,
   Sun,
@@ -35,7 +36,7 @@ import { readSequenceFile, serializeDNAFile, type XdnaFile, type Feature } from 
 export const Route = createFileRoute('/')({ component: App });
 
 type ViewerMode = 'circular' | 'linear' | 'both';
-type Tab = 'viewer' | 'info' | 'scanner';
+type Tab = 'viewer' | 'features' | 'scanner' | 'info';
 
 function updateFeatures(xdna: XdnaFile, updater: (features: Feature[]) => Feature[]): XdnaFile {
   const current_annotations = xdna.annotations ?? {
@@ -153,7 +154,7 @@ function App() {
   const { theme, setTheme } = useTheme();
 
   const handleFile = useCallback(async (file: File) => {
-    if (!/\.(xdna|txt)$/i.test(file.name)) {
+    if (!/\.(xdna|txt|fa|fas|fasta|fna|gb|gbk|genbank|ape|dna|seq|xml|rdf|jbei)$/i.test(file.name)) {
       setError(`Unsupported file type: "${file.name}"`);
       return;
     }
@@ -244,6 +245,15 @@ function App() {
     [selectedFeatureIndex],
   );
 
+  const handleFeatureEdit = useCallback(
+    (index: number) => {
+      handleSidebarSelect(index);
+      setFeatureToEdit(index);
+      setActiveTab('features');
+    },
+    [handleSidebarSelect],
+  );
+
   const handleFeatureAdd = useCallback(() => {
     const next_index = features.reduce((max, feature) => Math.max(max, feature.index), 0) + 1;
     const next_feature = xdna ? createFeature(xdna.header.sequenceLength, next_index, selectedFeature) : null;
@@ -268,6 +278,7 @@ function App() {
       type: next_feature.type as any,
       clockwise: next_feature.flags.strand !== 'reverse',
     });
+    setActiveTab('features');
   }, [features, selectedFeature, xdna]);
 
   const handleFeatureDelete = useCallback(
@@ -346,7 +357,7 @@ function App() {
         clockwise: next_feature.flags.strand !== 'reverse',
       });
       setFeatureToEdit(next_index);
-      setActiveTab('viewer');
+      setActiveTab('features');
     },
     [features, xdna],
   );
@@ -385,7 +396,6 @@ function App() {
 
       {/* ── Body ── */}
       <div className="app-body">
-        {/* ── Sidebar ── */}
         {xdna && (
           <aside className="app-sidebar">
             <div className="border-border flex shrink-0 items-center gap-2 border-b px-3 py-2">
@@ -399,16 +409,55 @@ function App() {
               </Button>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
-              <FeatureList
-                features={features}
-                selectedFeature={selectedFeatureIndex}
-                onSelectFeature={handleSidebarSelect}
-                onUpdateFeature={handleFeatureUpdate}
-                onDeleteFeature={handleFeatureDelete}
-                autoEditFeature={featureToEdit}
-                onAutoEditHandled={() => setFeatureToEdit(null)}
-              />
+            <div className="flex-1 overflow-y-auto px-2 py-2">
+              {features.length === 0 ? (
+                <div className="text-muted-foreground flex h-full items-center justify-center px-4 text-center text-sm">
+                  No features annotated yet.
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {features.map((feature) => {
+                    const is_selected = selectedFeatureIndex === feature.index;
+
+                    return (
+                      <div
+                        key={feature.index}
+                        className={cn(
+                          'group border-border flex items-center gap-2 rounded-lg border px-2.5 py-2 transition-colors',
+                          is_selected ? 'border-primary/50 bg-accent' : 'bg-card hover:bg-muted/50',
+                        )}
+                        onClick={() => handleSidebarSelect(is_selected ? null : feature.index)}
+                      >
+                        <span
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ background: `rgb(${feature.color.split(',').slice(0, 3).join(',')})` }}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="text-foreground truncate text-sm font-medium">
+                            {feature.name || '(unnamed)'}
+                          </div>
+                          <div className="text-muted-foreground mt-0.5 truncate text-[11px]">
+                            {feature.start.toLocaleString()}-{feature.end.toLocaleString()} ·{' '}
+                            {feature.type || 'Unknown'}
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          title="Edit feature"
+                          className="opacity-70 group-hover:opacity-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleFeatureEdit(feature.index);
+                          }}
+                        >
+                          <Pencil size={13} />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="border-border text-muted-foreground shrink-0 space-y-0.5 border-t px-3 py-2.5 text-xs">
@@ -425,17 +474,17 @@ function App() {
                 <span className="text-foreground font-medium capitalize">{xdna.header.topology}</span>
               </div>
               {xdna.annotations?.rightOverhang.type !== 'none' && (
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-2">
                   <span>3′ overhang</span>
-                  <span className="text-foreground font-mono font-medium">
+                  <span className="text-foreground truncate font-mono font-medium">
                     {xdna.annotations?.rightOverhang.sequence}
                   </span>
                 </div>
               )}
               {xdna.annotations?.leftOverhang.type !== 'none' && (
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-2">
                   <span>5′ overhang</span>
-                  <span className="text-foreground font-mono font-medium">
+                  <span className="text-foreground truncate font-mono font-medium">
                     {xdna.annotations?.leftOverhang.sequence}
                   </span>
                 </div>
@@ -455,9 +504,12 @@ function App() {
                 <Dna size={12} />
                 Viewer
               </button>
-              <button className={cn('app-tab', activeTab === 'info' && 'active')} onClick={() => setActiveTab('info')}>
-                <Info size={12} />
-                Info
+              <button
+                className={cn('app-tab', activeTab === 'features' && 'active')}
+                onClick={() => setActiveTab('features')}
+              >
+                <List size={12} />
+                Features
               </button>
               <button
                 className={cn('app-tab', activeTab === 'scanner' && 'active')}
@@ -465,6 +517,10 @@ function App() {
               >
                 <ScanSearch size={12} />
                 Sequence Scan
+              </button>
+              <button className={cn('app-tab', activeTab === 'info' && 'active')} onClick={() => setActiveTab('info')}>
+                <Info size={12} />
+                Info
               </button>
 
               {activeTab === 'viewer' && (
@@ -594,6 +650,49 @@ function App() {
                   selection={selectedFeature as ExternalSelection}
                   onSelection={(selection) => setSelectedFeature(selection)}
                   search={search}
+                />
+              </div>
+            )}
+
+            {xdna && activeTab === 'features' && (
+              <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+                <div className="border-border bg-card flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                      Features
+                    </span>
+                    <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium">
+                      {features.length}
+                    </span>
+                  </div>
+                  <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-xs">
+                    <span>
+                      Type: <span className="text-foreground font-medium">{xdna.header.sequenceType}</span>
+                    </span>
+                    <span>
+                      Length:{' '}
+                      <span className="text-foreground font-medium">
+                        {xdna.header.sequenceLength.toLocaleString()} bp
+                      </span>
+                    </span>
+                    <span>
+                      Topology: <span className="text-foreground font-medium capitalize">{xdna.header.topology}</span>
+                    </span>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={handleFeatureAdd} className="ml-auto gap-1.5">
+                    <Plus size={13} />
+                    Add feature
+                  </Button>
+                </div>
+
+                <FeatureList
+                  features={features}
+                  selectedFeature={selectedFeatureIndex}
+                  onSelectFeature={handleSidebarSelect}
+                  onUpdateFeature={handleFeatureUpdate}
+                  onDeleteFeature={handleFeatureDelete}
+                  autoEditFeature={featureToEdit}
+                  onAutoEditHandled={() => setFeatureToEdit(null)}
                 />
               </div>
             )}

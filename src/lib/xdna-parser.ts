@@ -3,6 +3,9 @@
  * All logic mirrors src/lib/xdna.ts but works in browser environments.
  */
 
+import seqparse from 'seqparse';
+import type { Annotation, Seq } from 'seqparse';
+
 const HEADER_SIZE = 112;
 
 const decoder = new TextDecoder('latin1');
@@ -130,13 +133,15 @@ export type Overhang = {
   sequence: string;
 };
 
+export type SequenceFormat = 'XDNA' | 'TXT' | 'FASTA' | 'GENBANK' | 'SNAPGENE' | 'SBOL' | 'JBEI' | 'SEQ';
+
 export type XdnaFile = {
-  file: { size: number; format: 'XDNA' | 'TXT' | 'FASTA'; name: string };
+  file: { size: number; format: SequenceFormat; name: string };
   header: {
     version: number;
     sequenceType: string;
     rawSequenceType: number;
-    topology: 'linear' | 'circular' | string;
+    topology: string;
     rawTopology: number;
     sequenceLength: number;
     negativeLength: number;
@@ -161,40 +166,112 @@ export type XdnaFile = {
   } | null;
 };
 
-function parseFastaText(text: string): { sequence: string; comment: string } {
-  const lines = text.split(/\r\n|\n|\r/);
-  const header_line = lines[0]?.trim();
+function inferFormatFromFileName(file_name: string): SequenceFormat {
+  const lower_name = file_name.toLowerCase();
 
-  if (!header_line?.startsWith('>')) {
-    fail('FASTA file must start with a header line beginning with ">"');
+  if (lower_name.endsWith('.xdna')) return 'XDNA';
+  if (lower_name.endsWith('.txt')) return 'TXT';
+  if (lower_name.endsWith('.fa') || lower_name.endsWith('.fas') || lower_name.endsWith('.fasta') || lower_name.endsWith('.fna')) {
+    return 'FASTA';
+  }
+  if (
+    lower_name.endsWith('.gb') ||
+    lower_name.endsWith('.gbk') ||
+    lower_name.endsWith('.genbank') ||
+    lower_name.endsWith('.ape')
+  ) {
+    return 'GENBANK';
+  }
+  if (lower_name.endsWith('.dna')) return 'SNAPGENE';
+  if (lower_name.endsWith('.xml') || lower_name.endsWith('.rdf')) return 'SBOL';
+  if (lower_name.endsWith('.jbei')) return 'JBEI';
+  if (lower_name.endsWith('.seq')) return 'SEQ';
+  return 'TXT';
+}
+
+function annotationColorToXdna(color?: string): string {
+  if (!color)     return '150,150,150,';
+
+  const rgb_match = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+  if (rgb_match) {
+    return `${rgb_match[1]},${rgb_match[2]},${rgb_match[3]},`;
   }
 
-  const comment = header_line.slice(1).trim();
-  const sequence_lines: string[] = [];
-
-  for (let index = 1; index < lines.length; index += 1) {
-    const trimmed_line = lines[index]?.trim() ?? '';
-
-    if (!trimmed_line) continue;
-
-    if (trimmed_line.startsWith('>')) {
-      fail('FASTA file contains multiple sequence records; only single-record FASTA is supported');
-    }
-
-    sequence_lines.push(trimmed_line);
+  const normalized = color.trim().replace('#', '');
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+    return '150,150,150,';
   }
 
-  const sequence = sequence_lines.join('').toUpperCase();
+  return `${Number.parseInt(normalized.slice(0, 2), 16)},${Number.parseInt(normalized.slice(2, 4), 16)},${Number.parseInt(normalized.slice(4, 6), 16)},`;
+}
 
+function annotationToFeature(annotation: Annotation, index: number): Feature {
+  const start = Math.max(1, annotation.start + 1);
+  const end = Math.max(1, annotation.end);
+  const strand = annotation.direction === -1 ? 'reverse' : 'forward';
+  const description = annotation.type ?? '';
+
+  return {
+    index,
+    name: annotation.name || `feature_${index}`,
+    description,
+    descriptionLines: description ? [description] : [],
+    type: annotation.type ?? '',
+    start,
+    end,
+    flags: {
+      strand,
+      rawStrand: strand === 'forward' ? 1 : 0,
+      visible: true,
+      rawVisible: 1,
+      unknown: 0,
+      arrow: true,
+      rawArrow: 1,
+    },
+    color: annotationColorToXdna(annotation.color),
+  };
+}
+
+function parsedSequenceToXdnaFile(parsed_sequence: Seq, fileName: string, fileSize: number): XdnaFile {
+  const sequence = parsed_sequence.seq.toUpperCase();
   if (!sequence) {
-    fail('FASTA file does not contain a sequence');
+    fail('Sequence file does not contain a sequence');
   }
 
-  if (!/^[ACGTRYSWKMBDHVNUX*.-]+$/i.test(sequence)) {
-    fail('FASTA file contains unsupported characters');
-  }
+  const comment = parsed_sequence.name?.trim() ?? '';
+  const features = parsed_sequence.annotations.map((annotation, index) => annotationToFeature(annotation, index + 1));
+  const format = inferFormatFromFileName(fileName);
 
-  return { sequence, comment };
+  return {
+    file: { size: fileSize, format, name: fileName },
+    header: {
+      version: 0,
+      sequenceType: parsed_sequence.type === 'rna' ? 'RNA' : parsed_sequence.type === 'aa' ? 'protein' : 'DNA',
+      rawSequenceType: parsed_sequence.type === 'rna' ? 3 : parsed_sequence.type === 'aa' ? 4 : 1,
+      topology: 'circular',
+      rawTopology: 0,
+      sequenceLength: sequence.length,
+      negativeLength: 0,
+      commentLength: comment.length,
+      terminator: 0,
+    },
+    offsets: {
+      header: { start: 0, end: 0 },
+      sequence: { start: 0, end: sequence.length },
+      comment: { start: sequence.length, end: sequence.length + comment.length },
+      annotations: features.length > 0 ? { start: sequence.length + comment.length, end: sequence.length + comment.length } : null,
+    },
+    sequence,
+    comment,
+    annotations: {
+      marker: 0,
+      rightOverhang: { side: 'right', type: 'none', declaredLength: 0, sequence: '' },
+      leftOverhang: { side: 'left', type: 'none', declaredLength: 0, sequence: '' },
+      featureCount: features.length,
+      features,
+      trailingBytes: 0,
+    },
+  };
 }
 
 function parseFeature(view: DataView, offset: number, index: number): { feature: Feature; nextOffset: number } {
@@ -246,7 +323,7 @@ function parseSequenceType(value: number): string {
   return `unknown(${value})`;
 }
 
-function parseTopology(value: number): 'linear' | 'circular' | string {
+function parseTopology(value: number): string {
   if (value === 0) return 'linear';
   if (value === 1) return 'circular';
   return `unknown(${value})`;
@@ -332,39 +409,27 @@ export function parseXdnaBuffer(buffer: ArrayBuffer, fileName = 'unknown.xdna'):
     annotations,
   };
 }
-export function parseDnaText(text: string, fileName = 'unknown.txt', fileSize = text.length): XdnaFile {
-  const normalized_text = text.replace(/^\uFEFF/, '');
-  const is_fasta = normalized_text.startsWith('>');
-  const { sequence, comment } = is_fasta
-    ? parseFastaText(normalized_text)
-    : { sequence: normalized_text.replace(/\s+/g, '').toUpperCase(), comment: '' };
 
-  if (!sequence) fail('DNA text file is empty');
-  if (!is_fasta && !/^[ACGTRYSWKMBDHVNUX*.-]+$/i.test(sequence)) fail('DNA text file contains unsupported characters');
+export async function parseSequenceInput(
+  input: string,
+  options: { file_name?: string; file_size?: number; source?: ArrayBuffer } = {},
+): Promise<XdnaFile> {
+  const file_name = options.file_name ?? 'unknown.txt';
+  const parsed_sequence = await seqparse(input.replace(/^\uFEFF/, ''), {
+    fileName: file_name,
+    source: options.source,
+  });
 
-  return {
-    file: { size: fileSize, format: is_fasta ? 'FASTA' : 'TXT', name: fileName },
-    header: {
-      version: 0,
-      sequenceType: 'DNA',
-      rawSequenceType: 1,
-      topology: 'circular',
-      rawTopology: 0,
-      sequenceLength: sequence.length,
-      negativeLength: 0,
-      commentLength: comment.length,
-      terminator: 0,
-    },
-    offsets: {
-      header: { start: 0, end: 0 },
-      sequence: { start: 0, end: sequence.length },
-      comment: { start: sequence.length, end: sequence.length + comment.length },
-      annotations: null,
-    },
-    sequence,
-    comment,
-    annotations: null,
-  };
+  return parsedSequenceToXdnaFile(parsed_sequence, file_name, options.file_size ?? input.length);
+}
+
+export function parseDnaText(
+  text: string,
+  fileName = 'unknown.txt',
+  fileSize = text.length,
+  source?: ArrayBuffer,
+): Promise<XdnaFile> {
+  return parseSequenceInput(text, { file_name: fileName, file_size: fileSize, source });
 }
 
 /** Parse the color string "R,G,B," → CSS rgb() */
@@ -399,8 +464,8 @@ export async function readSequenceFile(file: File): Promise<XdnaFile> {
 
   if (name.endsWith('.xdna')) return readXdnaFile(file);
 
-  const text = await file.text();
-  return parseDnaText(text, file.name, file.size);
+  const [text, source] = await Promise.all([file.text(), file.arrayBuffer()]);
+  return parseSequenceInput(text, { file_name: file.name, file_size: file.size, source });
 }
 
 function normalizeOverhangLength(overhang: Overhang): number {

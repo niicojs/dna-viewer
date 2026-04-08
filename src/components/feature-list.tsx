@@ -1,9 +1,9 @@
-import { ArrowRight, ArrowLeft, EyeOff, ChevronDown, ChevronRight, Pencil } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, ArrowRight, EyeOff, Pencil, Trash2, X, Check } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Button } from '#/components/ui/button';
 import { cn } from '#/lib/utils';
-import type { Feature } from '#/lib/xdna-parser';
-import { featureColorToCss } from '#/lib/xdna-parser';
+import { featureColorToCss, type Feature } from '#/lib/xdna-parser';
 
 const TYPE_LABELS: Record<string, string> = {
   misc_feature: 'Misc',
@@ -47,7 +47,7 @@ function featureToDraft(feature: Feature): FeatureDraft {
     strand: feature.flags.strand,
     visible: feature.flags.visible,
     color: feature.color,
-    description: feature.description,
+    description: feature.description.replace(/\r/g, '\n'),
   };
 }
 
@@ -88,6 +88,160 @@ function hexToColorString(value: string) {
   return `${Number.parseInt(normalized.slice(0, 2), 16)},${Number.parseInt(normalized.slice(2, 4), 16)},${Number.parseInt(normalized.slice(4, 6), 16)},`;
 }
 
+function FeatureSummary({ feature }: { feature: Feature }) {
+  const length = Math.abs(feature.end - feature.start) + 1;
+
+  return (
+    <div className="text-muted-foreground grid gap-3 text-xs md:grid-cols-[minmax(0,1.7fr)_110px_130px_110px_100px]">
+      <div className="min-w-0">
+        <div className="text-foreground truncate font-medium">{feature.name || '(unnamed)'}</div>
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          <span className="bg-muted rounded-full px-2 py-0.5">{typeLabel(feature.type)}</span>
+          {!feature.flags.visible && (
+            <span className="bg-muted inline-flex items-center gap-1 rounded-full px-2 py-0.5">
+              <EyeOff size={11} /> Hidden
+            </span>
+          )}
+        </div>
+      </div>
+      <div>
+        <div className="text-[10px] tracking-wider uppercase">Range</div>
+        <div className="text-foreground mt-1 font-mono">
+          {feature.start.toLocaleString()}-{feature.end.toLocaleString()}
+        </div>
+      </div>
+      <div>
+        <div className="text-[10px] tracking-wider uppercase">Strand</div>
+        <div className="text-foreground mt-1 inline-flex items-center gap-1">
+          {feature.flags.strand === 'forward' ? <ArrowRight size={12} /> : <ArrowLeft size={12} />}
+          {feature.flags.strand}
+        </div>
+      </div>
+      <div>
+        <div className="text-[10px] tracking-wider uppercase">Length</div>
+        <div className="text-foreground mt-1">{length.toLocaleString()} bp</div>
+      </div>
+      <div className="min-w-0">
+        <div className="text-[10px] tracking-wider uppercase">Notes</div>
+        <div className="text-foreground mt-1 truncate">{feature.descriptionLines[0] ?? 'No description'}</div>
+      </div>
+    </div>
+  );
+}
+
+function FeatureEditor({
+  feature,
+  draft,
+  onChange,
+  onCancel,
+  onDelete,
+  onSave,
+}: {
+  feature: Feature;
+  draft: FeatureDraft;
+  onChange: (next_draft: FeatureDraft) => void;
+  onCancel: () => void;
+  onDelete: () => void;
+  onSave: () => void;
+}) {
+  return (
+    <div className="border-border bg-muted/30 space-y-3 rounded-b-xl border-t px-4 py-4">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_160px_120px_120px_140px_120px]">
+        <label className="space-y-1">
+          <span className="text-muted-foreground text-xs font-medium">Name</span>
+          <input
+            value={draft.name}
+            onChange={(e) => onChange({ ...draft, name: e.target.value })}
+            className="border-border bg-background text-foreground h-9 w-full rounded-md border px-3 text-sm outline-none"
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="text-muted-foreground text-xs font-medium">Type</span>
+          <input
+            value={draft.type}
+            onChange={(e) => onChange({ ...draft, type: e.target.value })}
+            className="border-border bg-background text-foreground h-9 w-full rounded-md border px-3 text-sm outline-none"
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="text-muted-foreground text-xs font-medium">Start</span>
+          <input
+            value={draft.start}
+            onChange={(e) => onChange({ ...draft, start: e.target.value })}
+            className="border-border bg-background text-foreground h-9 w-full rounded-md border px-3 text-sm outline-none"
+            inputMode="numeric"
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="text-muted-foreground text-xs font-medium">End</span>
+          <input
+            value={draft.end}
+            onChange={(e) => onChange({ ...draft, end: e.target.value })}
+            className="border-border bg-background text-foreground h-9 w-full rounded-md border px-3 text-sm outline-none"
+            inputMode="numeric"
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="text-muted-foreground text-xs font-medium">Strand</span>
+          <select
+            value={draft.strand}
+            onChange={(e) => onChange({ ...draft, strand: e.target.value === 'reverse' ? 'reverse' : 'forward' })}
+            className="border-border bg-background text-foreground h-9 w-full rounded-md border px-3 text-sm outline-none"
+          >
+            <option value="forward">Forward</option>
+            <option value="reverse">Reverse</option>
+          </select>
+        </label>
+        <div className="space-y-1">
+          <span className="text-muted-foreground text-xs font-medium">Color</span>
+          <div className="border-border bg-background flex h-9 items-center gap-2 rounded-md border px-2">
+            <input
+              type="color"
+              value={colorStringToHex(draft.color)}
+              onChange={(e) => onChange({ ...draft, color: hexToColorString(e.target.value) })}
+              className="h-6 w-8 rounded border-0 bg-transparent p-0"
+            />
+            <span className="text-muted-foreground truncate text-xs">{draft.color || feature.color}</span>
+          </div>
+        </div>
+      </div>
+
+      <label className="text-foreground flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={draft.visible}
+          onChange={(e) => onChange({ ...draft, visible: e.target.checked })}
+        />
+        Visible in viewer
+      </label>
+
+      <label className="space-y-1">
+        <span className="text-muted-foreground text-xs font-medium">Description</span>
+        <textarea
+          value={draft.description}
+          onChange={(e) => onChange({ ...draft, description: e.target.value })}
+          className="border-border bg-background text-foreground min-h-24 w-full rounded-md border px-3 py-2 text-sm outline-none"
+        />
+      </label>
+
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={onDelete} className="text-destructive mr-auto gap-1.5">
+          <Trash2 size={13} />
+          Delete
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onCancel} className="gap-1.5">
+          <X size={13} />
+          Cancel
+        </Button>
+        <Button size="sm" onClick={onSave} className="gap-1.5">
+          <Check size={13} />
+          Save
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function FeatureList({
   features,
   selectedFeature,
@@ -97,9 +251,9 @@ export function FeatureList({
   autoEditFeature,
   onAutoEditHandled,
 }: Props) {
-  const [expanded, setExpanded] = useState<number | null>(null);
   const [editing, setEditing] = useState<number | null>(null);
   const [draft, setDraft] = useState<FeatureDraft | null>(null);
+  const item_ref_map = useRef(new Map<number, HTMLElement>());
 
   const feature_by_index = useMemo(() => new Map(features.map((feature) => [feature.index, feature])), [features]);
 
@@ -128,23 +282,34 @@ export function FeatureList({
       return;
     }
 
-    start_edit(feature);
+    setEditing(feature.index);
+    setDraft(featureToDraft(feature));
     onSelectFeature(feature.index);
     onAutoEditHandled?.();
   }, [autoEditFeature, feature_by_index, onAutoEditHandled, onSelectFeature]);
 
-  function start_edit(feature: Feature) {
-    setExpanded(feature.index);
-    setEditing(feature.index);
-    setDraft(featureToDraft(feature));
-  }
+  useEffect(() => {
+    if (editing == null) {
+      return;
+    }
 
-  function cancel_edit() {
+    const element = item_ref_map.current.get(editing);
+    if (!element) {
+      return;
+    }
+
+    element.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+    const input = element.querySelector<HTMLInputElement>('input, textarea, select');
+    input?.focus();
+  }, [editing]);
+
+  function cancelEdit() {
     setEditing(null);
     setDraft(null);
   }
 
-  function save_edit(feature: Feature) {
+  function saveEdit(feature: Feature) {
     if (!draft) {
       return;
     }
@@ -175,226 +340,76 @@ export function FeatureList({
 
   if (features.length === 0) {
     return (
-      <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-12 text-sm">
-        No features annotated
+      <div className="border-border bg-muted/20 text-muted-foreground rounded-xl border border-dashed px-6 py-16 text-center text-sm">
+        No features annotated yet.
       </div>
     );
   }
 
   return (
-    <div className="divide-border flex flex-col divide-y text-sm">
-      {features.map((f) => {
-        const color = featureColorToCss(f.color);
-        const isSelected = selectedFeature === f.index;
-        const isExpanded = expanded === f.index;
-        const isEditing = editing === f.index && draft !== null;
-        const length = Math.abs(f.end - f.start) + 1;
+    <div className="space-y-3">
+      {features.map((feature) => {
+        const color = featureColorToCss(feature.color);
+        const is_selected = selectedFeature === feature.index;
+        const is_editing = editing === feature.index && draft !== null;
 
         return (
-          <div key={f.index}>
+          <section
+            key={feature.index}
+            ref={(node) => {
+              if (node) {
+                item_ref_map.current.set(feature.index, node);
+              } else {
+                item_ref_map.current.delete(feature.index);
+              }
+            }}
+            className={cn(
+              'overflow-hidden rounded-xl border bg-card transition-colors',
+              is_selected ? 'border-primary/50 shadow-sm' : 'border-border',
+            )}
+          >
             <div
-              className={cn(
-                'flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors',
-                isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-muted/60',
-              )}
+              className={cn('flex items-start gap-3 px-4 py-3', !is_editing && 'cursor-pointer hover:bg-muted/30')}
               onClick={() => {
-                onSelectFeature(isSelected ? null : f.index);
-                if (!isSelected) setExpanded(f.index);
+                if (is_editing) {
+                  return;
+                }
+
+                onSelectFeature(is_selected ? null : feature.index);
               }}
             >
-              {/* Color swatch */}
-              <span className="h-3 w-3 shrink-0 rounded-sm" style={{ background: color }} />
-
-              {/* Strand arrow */}
-              <span className="text-muted-foreground shrink-0">
-                {f.flags.strand === 'forward' ? <ArrowRight size={12} /> : <ArrowLeft size={12} />}
-              </span>
-
-              {/* Name */}
-              <span className="min-w-0 flex-1 truncate font-medium">{f.name || '(unnamed)'}</span>
-
-              {/* Visibility */}
-              {!f.flags.visible && (
-                <span className="text-muted-foreground shrink-0">
-                  <EyeOff size={12} />
-                </span>
-              )}
-
-              {/* Expand chevron */}
-              <button
-                type="button"
-                className="text-muted-foreground hover:text-foreground shrink-0 rounded p-1"
-                title="Edit feature"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  start_edit(f);
-                }}
-              >
-                <Pencil size={13} />
-              </button>
-
-              <button
-                type="button"
-                className="text-muted-foreground hover:text-foreground shrink-0 rounded p-0.5"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setExpanded(isExpanded ? null : f.index);
-                }}
-              >
-                {isExpanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
-              </button>
+              <span className="mt-1 h-3 w-3 shrink-0 rounded-full" style={{ background: color }} />
+              <div className="min-w-0 flex-1">
+                <FeatureSummary feature={feature} />
+              </div>
+              <div className="flex shrink-0 items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  title="Edit feature"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditing(feature.index);
+                    setDraft(featureToDraft(feature));
+                    onSelectFeature(feature.index);
+                  }}
+                >
+                  <Pencil size={13} />
+                </Button>
+              </div>
             </div>
 
-            {/* Expanded detail */}
-            {isExpanded && (
-              <div
-                className="bg-muted/30 text-muted-foreground space-y-1 border-l-2 px-4 py-2.5 text-xs"
-                style={{ borderLeftColor: color }}
-              >
-                {isEditing ? (
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      <label className="space-y-1">
-                        <span className="text-foreground/70 font-semibold">Name</span>
-                        <input
-                          value={draft.name}
-                          onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                          className="border-border bg-background text-foreground w-full rounded border px-2 py-1"
-                        />
-                      </label>
-                      <label className="space-y-1">
-                        <span className="text-foreground/70 font-semibold">Type</span>
-                        <input
-                          value={draft.type}
-                          onChange={(e) => setDraft({ ...draft, type: e.target.value })}
-                          className="border-border bg-background text-foreground w-full rounded border px-2 py-1"
-                        />
-                      </label>
-                      <label className="space-y-1">
-                        <span className="text-foreground/70 font-semibold">Start</span>
-                        <input
-                          value={draft.start}
-                          onChange={(e) => setDraft({ ...draft, start: e.target.value })}
-                          className="border-border bg-background text-foreground w-full rounded border px-2 py-1"
-                          inputMode="numeric"
-                        />
-                      </label>
-                      <label className="space-y-1">
-                        <span className="text-foreground/70 font-semibold">End</span>
-                        <input
-                          value={draft.end}
-                          onChange={(e) => setDraft({ ...draft, end: e.target.value })}
-                          className="border-border bg-background text-foreground w-full rounded border px-2 py-1"
-                          inputMode="numeric"
-                        />
-                      </label>
-                      <label className="space-y-1">
-                        <span className="text-foreground/70 font-semibold">Strand</span>
-                        <select
-                          value={draft.strand}
-                          onChange={(e) =>
-                            setDraft({
-                              ...draft,
-                              strand: e.target.value === 'reverse' ? 'reverse' : 'forward',
-                            })
-                          }
-                          className="border-border bg-background text-foreground w-full rounded border px-2 py-1"
-                        >
-                          <option value="forward">Forward</option>
-                          <option value="reverse">Reverse</option>
-                        </select>
-                      </label>
-                      <label className="space-y-1">
-                        <span className="text-foreground/70 font-semibold">Color</span>
-                        <input
-                          type="color"
-                          value={colorStringToHex(draft.color)}
-                          onChange={(e) => setDraft({ ...draft, color: hexToColorString(e.target.value) })}
-                          className="border-border bg-background h-9 w-full rounded border px-1 py-1"
-                        />
-                      </label>
-                    </div>
-
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={draft.visible}
-                        onChange={(e) => setDraft({ ...draft, visible: e.target.checked })}
-                      />
-                      <span className="text-foreground/70 font-semibold">Visible</span>
-                    </label>
-
-                    <label className="block space-y-1">
-                      <span className="text-foreground/70 font-semibold">Description</span>
-                      <textarea
-                        value={draft.description.replace(/\r/g, '\n')}
-                        onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-                        className="border-border bg-background text-foreground min-h-20 w-full rounded border px-2 py-1"
-                      />
-                    </label>
-
-                    <div className="flex justify-end gap-2 pt-1">
-                      <button
-                        type="button"
-                        className="border-destructive/40 text-destructive hover:bg-destructive/10 mr-auto rounded border px-2 py-1"
-                        onClick={() => onDeleteFeature(f.index)}
-                      >
-                        Delete
-                      </button>
-                      <button
-                        type="button"
-                        className="border-border hover:bg-background rounded border px-2 py-1"
-                        onClick={cancel_edit}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="button"
-                        className="bg-primary text-primary-foreground rounded px-2 py-1"
-                        onClick={() => save_edit(f)}
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
-                      <span className="text-foreground/70 font-semibold">Type</span>
-                      <span>{typeLabel(f.type)}</span>
-                      <span className="text-foreground/70 font-semibold">Position</span>
-                      <span>
-                        {f.start.toLocaleString()} → {f.end.toLocaleString()}
-                      </span>
-                      <span className="text-foreground/70 font-semibold">Length</span>
-                      <span>{length.toLocaleString()} bp</span>
-                      <span className="text-foreground/70 font-semibold">Strand</span>
-                      <span className="flex items-center gap-1">
-                        {f.flags.strand === 'forward' ? (
-                          <>
-                            <ArrowRight size={10} /> forward
-                          </>
-                        ) : (
-                          <>
-                            <ArrowLeft size={10} /> reverse
-                          </>
-                        )}
-                      </span>
-                    </div>
-                    {f.descriptionLines.length > 0 && (
-                      <div className="border-border mt-1.5 border-t pt-1.5">
-                        {f.descriptionLines.map((line, i) => (
-                          <p key={i} className="leading-relaxed break-all">
-                            {line}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+            {is_editing && draft && (
+              <FeatureEditor
+                feature={feature}
+                draft={draft}
+                onChange={setDraft}
+                onCancel={cancelEdit}
+                onDelete={() => onDeleteFeature(feature.index)}
+                onSave={() => saveEdit(feature)}
+              />
             )}
-          </div>
+          </section>
         );
       })}
     </div>

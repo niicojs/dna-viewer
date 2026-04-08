@@ -27,6 +27,7 @@
     "nitro": "npm:nitro-nightly@latest",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "seqparse": "^0.2.2",
     "seqviz": "^3.10.19",
     "shadcn": "^4.1.2",
     "tailwind-merge": "^3.5.0",

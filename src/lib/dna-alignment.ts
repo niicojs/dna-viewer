@@ -1,4 +1,4 @@
-import { parseDnaText } from '#/lib/xdna-parser';
+import { parseDnaText, type SequenceFormat } from '#/lib/xdna-parser';
 
 export type AlignmentConfig = {
   match_score: number;
@@ -41,7 +41,7 @@ export type AlignmentResult = {
 
 export type LoadedSequenceFile = {
   name: string;
-  format: 'XDNA' | 'TXT' | 'FASTA';
+  format: SequenceFormat;
   size: number;
   sequence: string;
   comment: string;
@@ -76,11 +76,22 @@ export async function readAlignmentSequenceFile(file: File): Promise<LoadedSeque
   if (
     lower_name.endsWith('.txt') ||
     lower_name.endsWith('.fa') ||
+    lower_name.endsWith('.fas') ||
     lower_name.endsWith('.fasta') ||
-    lower_name.endsWith('.fna')
+    lower_name.endsWith('.fna') ||
+    lower_name.endsWith('.gb') ||
+    lower_name.endsWith('.gbk') ||
+    lower_name.endsWith('.genbank') ||
+    lower_name.endsWith('.ape') ||
+    lower_name.endsWith('.dna') ||
+    lower_name.endsWith('.seq') ||
+    lower_name.endsWith('.xml') ||
+    lower_name.endsWith('.rdf') ||
+    lower_name.endsWith('.jbei')
   ) {
     const text = await file.text();
-    const parsed = parseDnaText(text, file.name, file.size);
+    const source = await file.arrayBuffer();
+    const parsed = await parseDnaText(text, file.name, file.size, source);
 
     return {
       name: parsed.file.name,

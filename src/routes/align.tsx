@@ -174,7 +174,9 @@ function AlignPage() {
                 <RefreshCcw size={14} />
                 Reset result
               </Button>
-              <span className="text-muted-foreground text-xs">Accepted formats: .xdna, .txt, .fa, .fasta, .fna</span>
+              <span className="text-muted-foreground text-xs">
+                Accepted formats: .xdna, .txt, .fa, .fas, .fasta, .fna, .gb, .gbk, .genbank, .ape, .dna, .seq, .xml, .rdf, .jbei
+              </span>
             </section>
 
             {error && (
@@ -309,7 +311,7 @@ function SequenceCard({
           <Upload size={20} className="text-muted-foreground" />
           <p className="mt-3 text-sm font-medium">No file loaded</p>
           <p className="text-muted-foreground mt-1 max-w-sm text-xs">
-            Load DNA text, FASTA, or XDNA to use as the {title.toLowerCase()} sequence.
+            Load XDNA or a sequence file such as FASTA, GenBank, SnapGene, SBOL, or JBEI to use as the {title.toLowerCase()} sequence.
           </p>
         </div>
       )}
