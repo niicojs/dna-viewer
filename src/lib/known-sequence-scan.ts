@@ -428,9 +428,7 @@ export function getKnownSequenceHits(xdna: XdnaFile, custom_targets: KnownSequen
         color: target.color,
       };
 
-      if (!dna_target.sequence.length) {
-        continue;
-      }
+      if (!dna_target.sequence.length) continue;
 
       pushDnaHits(sequence, dna_target, 'forward', hits);
       pushDnaHits(reverse_sequence, dna_target, 'reverse', hits);
@@ -446,9 +444,7 @@ export function getKnownSequenceHits(xdna: XdnaFile, custom_targets: KnownSequen
       color: target.color,
     };
 
-    if (!peptide_target.peptide.length) {
-      continue;
-    }
+    if (!peptide_target.peptide.length) continue;
 
     pushPeptideHits(sequence, peptide_target, 'forward', hits);
     pushPeptideHits(reverse_sequence, peptide_target, 'reverse', hits);

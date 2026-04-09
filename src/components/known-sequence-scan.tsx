@@ -84,7 +84,7 @@ export function KnownSequenceScan({ xdna, settings, onPreviewHit, onAddHit }: Pr
 
           <Button className="mt-4 w-full" onClick={runScan}>
             <Play size={13} />
-            Lancer le scan
+            Run scan
           </Button>
         </div>
 
@@ -141,7 +141,7 @@ export function KnownSequenceScan({ xdna, settings, onPreviewHit, onAddHit }: Pr
           <div className="flex h-full min-h-80 items-center justify-center">
             <Button size="lg" onClick={runScan}>
               <Play size={14} />
-              Lancer le scan
+              Run scan
             </Button>
           </div>
         ) : filtered_hits.length > 0 ? (

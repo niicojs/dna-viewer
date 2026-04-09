@@ -130,14 +130,12 @@ function FeatureSummary({ feature }: { feature: Feature }) {
 }
 
 function FeatureEditor({
-  feature,
   draft,
   onChange,
   onCancel,
   onDelete,
   onSave,
 }: {
-  feature: Feature;
   draft: FeatureDraft;
   onChange: (next_draft: FeatureDraft) => void;
   onCancel: () => void;
@@ -194,14 +192,13 @@ function FeatureEditor({
         </label>
         <div className="space-y-1">
           <span className="text-muted-foreground text-xs font-medium">Color</span>
-          <div className="border-border bg-background flex h-9 items-center gap-2 rounded-md border px-2">
+          <div className="border-border bg-background flex h-9 items-center rounded-md border px-2">
             <input
               type="color"
               value={colorStringToHex(draft.color)}
               onChange={(e) => onChange({ ...draft, color: hexToColorString(e.target.value) })}
-              className="h-6 w-8 rounded border-0 bg-transparent p-0"
+              className="h-6 max-w-22 rounded border-0 bg-transparent p-0"
             />
-            <span className="text-muted-foreground truncate text-xs">{draft.color || feature.color}</span>
           </div>
         </div>
       </div>
@@ -401,7 +398,6 @@ export function FeatureList({
 
             {is_editing && draft && (
               <FeatureEditor
-                feature={feature}
                 draft={draft}
                 onChange={setDraft}
                 onCancel={cancelEdit}
